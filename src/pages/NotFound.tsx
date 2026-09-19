@@ -1,27 +1,45 @@
-import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { PageHero } from "@/components/shell/PageHero";
+import { Seo } from "@/components/Seo";
+import { Button } from "@/components/primitives/Button";
 
-const NotFound = () => {
+export default function NotFound() {
   const location = useLocation();
 
   useEffect(() => {
-    console.error(
-      "404 Error: User attempted to access non-existent route:",
-      location.pathname,
-    );
+    console.error("404 — no route for:", location.pathname);
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
-        <a href="/" className="text-blue-500 hover:text-blue-700 underline">
-          Return to Home
-        </a>
-      </div>
-    </div>
+    <>
+      <Seo
+        title="Page not found"
+        description="We couldn't find that page."
+        path={location.pathname}
+        noindex
+      />
+      <PageHero
+        eyebrow="404"
+        title="We couldn't find that page."
+        intro="The link may have moved, or the page may not be ready yet. Let's get you back on track."
+        crumbs={[{ label: "Not found" }]}
+      />
+      <section className="section">
+        <div className="wrap--narrow center-narrow">
+          <div className="btn-row" style={{ justifyContent: "center" }}>
+            <Button to="/" variant="primary" size="lg">
+              Back to home
+            </Button>
+            <Button to="/quote" variant="ink" size="lg">
+              Build your estimate
+            </Button>
+            <Button to="/portfolio" variant="outline" size="lg">
+              View the portfolio
+            </Button>
+          </div>
+        </div>
+      </section>
+    </>
   );
-};
-
-export default NotFound;
+}

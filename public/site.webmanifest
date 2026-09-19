@@ -1,0 +1,17 @@
+{
+  "name": "Lustique Co. — Bridal hair & makeup artistry",
+  "short_name": "Lustique Co.",
+  "description": "Bridal hair & makeup artistry in La Montagne, Pretoria.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FBF8F3",
+  "theme_color": "#A0625E",
+  "icons": [
+    {
+      "src": "/assets/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
