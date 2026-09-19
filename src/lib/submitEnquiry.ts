@@ -65,7 +65,7 @@ function reconcileError(
   label: string,
 ): string | null {
   const placed = placedHairTotal(group.hairCounts);
-  if (group.hair <= 0) return null;
+    if (group.hair <= 0) return null;
     if (placed !== group.hair) {
       const remaining = group.hair - placed;
       if (remaining > 0) {
@@ -74,7 +74,7 @@ function reconcileError(
       return `You've placed ${Math.abs(remaining)} more ${label} looks than need hair.`;
     }
     return null;
-}
+  }
 
 export function validateEnquiry(form: EnquiryForm): EnquiryErrors {
   const errors: EnquiryErrors = {};

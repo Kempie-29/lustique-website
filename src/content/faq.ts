@@ -1,6 +1,7 @@
 /**
  * Frequently asked questions. Kept to factual, schedule-derived answers only —
- * nothing promotional is invented. Rendered as an accordion on /faq (Phase 2).
+ * nothing promotional is invented. Rendered as an accordion on /faq, and used
+ * for FAQPage structured data. No review or rating markup anywhere.
  */
 
 export interface FaqEntry {
@@ -33,5 +34,29 @@ export const faqs: FaqEntry[] = [
     question: "How do I secure my date?",
     answer:
       "Send an enquiry through the estimator and we will confirm availability and next steps with you directly.",
+  },
+  {
+    id: "hair-length",
+    question: "Why does my estimate change when I change my hair length?",
+    answer:
+      "Hair is priced by length — short, medium, long and extra long — because longer and thicker hair takes more time to prepare and style. Changing the length you choose updates your estimate straight away.",
+  },
+  {
+    id: "promo",
+    question: "How does the current offer work?",
+    answer:
+      "Book hair and makeup for four or more full looks and the least-expensive eligible look is on us. The bride, under-12 flower girls and trials are never the look that is freed. Full terms are on our offer terms page.",
+  },
+  {
+    id: "events",
+    question: "Do you do matric farewells and events?",
+    answer:
+      "Yes. We offer event makeup and hair at the venue or in our studio, and group lessons for matric farewells priced per person by group size.",
+  },
+  {
+    id: "bring",
+    question: "What should I bring to my appointment?",
+    answer:
+      "Bring inspiration photos, your hair accessory or jewellery if you have it, and any questions. Arrive with a clean face and your hair in its usual state of washing.",
   },
 ];

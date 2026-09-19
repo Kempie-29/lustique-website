@@ -8,9 +8,16 @@
   <url><loc>https://www.lustiqueco.co.za/team</loc><priority>0.7</priority></url>
   <url><loc>https://www.lustiqueco.co.za/about</loc><priority>0.6</priority></url>
   <url><loc>https://www.lustiqueco.co.za/guides</loc><priority>0.6</priority></url>
+  <url><loc>https://www.lustiqueco.co.za/guides/preparing-your-skin</loc><priority>0.5</priority></url>
+  <url><loc>https://www.lustiqueco.co.za/guides/choosing-your-hair-length</loc><priority>0.5</priority></url>
+  <url><loc>https://www.lustiqueco.co.za/guides/wedding-morning-timeline</loc><priority>0.5</priority></url>
   <url><loc>https://www.lustiqueco.co.za/journal</loc><priority>0.6</priority></url>
+  <url><loc>https://www.lustiqueco.co.za/journal/quiet-mornings</loc><priority>0.5</priority></url>
+  <url><loc>https://www.lustiqueco.co.za/journal/why-we-trial</loc><priority>0.5</priority></url>
+  <url><loc>https://www.lustiqueco.co.za/journal/supplier-spotlight</loc><priority>0.5</priority></url>
   <url><loc>https://www.lustiqueco.co.za/faq</loc><priority>0.6</priority></url>
   <url><loc>https://www.lustiqueco.co.za/contact</loc><priority>0.6</priority></url>
+  <url><loc>https://www.lustiqueco.co.za/vendors</loc><priority>0.4</priority></url>
   <url><loc>https://www.lustiqueco.co.za/offer-terms</loc><priority>0.4</priority></url>
   <url><loc>https://www.lustiqueco.co.za/terms</loc><priority>0.3</priority></url>
   <url><loc>https://www.lustiqueco.co.za/privacy</loc><priority>0.3</priority></url>
