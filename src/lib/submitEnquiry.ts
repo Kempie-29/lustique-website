@@ -17,6 +17,8 @@ import {
   type FlowerGirlsUnder12Input,
   type EstimateLine,
 } from "@/lib/pricing";
+import { supabase } from "@/lib/supabase";
+import { createBookingRequest } from "@/lib/data/bookings";
 
 export interface EnquiryForm {
   occasion: Occasion;
@@ -134,7 +136,41 @@ export function getEndpoint(): string | undefined {
   return value && value.trim().length > 0 ? value : undefined;
 }
 
+/**
+ * Persist the enquiry to the live backend (`lux.booking_requests`). Returns null
+ * when the backend is unreachable so the caller can fall back to the endpoint or
+ * local dev storage — the public estimator must never break because of it.
+ */
+async function tryDatabase(payload: EnquiryPayload): Promise<SubmitResult | null> {
+  try {
+    const { data } = await supabase.auth.getUser();
+    const userId = data.user?.id ?? null;
+
+    const result = await createBookingRequest({
+      user_id: userId,
+      occasion: payload.occasion,
+      full_name: [payload.firstName, payload.lastName].filter(Boolean).join(" ") || null,
+      email: payload.email || null,
+      mobile: payload.mobile || null,
+      wedding_date: payload.occasion === "wedding" ? payload.weddingDate || null : null,
+      venue_name: payload.venueName || null,
+      venue_address: payload.venueAddress || null,
+      estimate_total: payload.estimate?.total ?? null,
+      payload: payload as unknown as Record<string, unknown>,
+    });
+
+    return result.ok ? { ok: true, message: "Your enquiry is with us." } : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function submitEnquiry(payload: EnquiryPayload): Promise<SubmitResult> {
+  // 1 · Live backend (the tracked request the dashboard/portal work from).
+  const fromDb = await tryDatabase(payload);
+  if (fromDb) return fromDb;
+
+  // 2 · Optional configured endpoint.
   const endpoint = getEndpoint();
 
   if (endpoint) {

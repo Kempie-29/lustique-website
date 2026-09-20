@@ -16,8 +16,9 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Portfolio", to: "/portfolio" },
   { label: "Pricing", to: "/pricing" },
   { label: "Guides", to: "/guides" },
-  { label: "Journal", to: "/journal" },
-];
+    { label: "Journal", to: "/journal" },
+    { label: "Your portal", to: "/portal" },
+  ];
 
 export function Header() {
   const [open, setOpen] = useState(false);
