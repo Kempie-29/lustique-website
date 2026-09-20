@@ -1,6 +1,7 @@
 /**
  * Every price in the estimator is sourced from here — nothing is hard-coded in
- * markup. Figures follow the live Lustique Co. pricing schedule.
+ * markup. Figures follow the live Lustique Co. pricing schedule (the `R` object
+ * in the live estimator bundle).
  */
 
 export type HairLength = "short" | "medium" | "long" | "xlong";
@@ -18,6 +19,17 @@ export const HAIR_LENGTHS: HairLengthOption[] = [
 ];
 
 export type HairLengthPrices = Record<HairLength, number>;
+
+/** Beyond-bridal occasions share the live flat per-face pricing model. */
+export const BEYOND_BRIDAL_OCCASIONS = [
+  "matric",
+  "editorial",
+  "engagement",
+  "corporate",
+  "pageant",
+] as const;
+
+export type BeyondBridalOccasion = (typeof BEYOND_BRIDAL_OCCASIONS)[number];
 
 export const PRICES = {
   /** The bride. Day + trial are the same price; trial is optional. */
@@ -53,20 +65,29 @@ export const PRICES = {
   },
 
   /**
-   * Beyond-bridal flat rates — charged per face/look, whatever the services.
-   * Matric reuses the per-face model of the live estimator.
+   * Beyond-bridal flat per-face rates. Matric, editorial, engagement, corporate
+   * and pageant reuse the event fields on the form (head count), then apply one
+   * flat rate per face — whatever services they receive.
    */
   beyondBridal: {
-    matric: 750,
-    editorial: 750,
-    engagement: 650,
-    pageant: 950,
+    rates: {
+      matric: 750,
+      editorial: 750,
+      engagement: 650,
+      corporate: 650,
+      pageant: 950,
+    } as Record<BeyondBridalOccasion, number>,
+    /** Fallback flat rate if a new occasion is added without a rate. */
+    default: 750,
+    /** Reference hair table for beyond-bridal occasions that include hair. */
+    hairTable: { short: 395, medium: 495, long: 595, xlong: 695 } as HairLengthPrices,
   },
 
   /** Group lessons — per attending face, tiered by group size (minimum 6). */
   lesson: {
     under10: 700,
     tenPlus: 600,
+    threshold: 10,
     minAttendees: 6,
   },
 
@@ -80,16 +101,49 @@ export const PRICES = {
     /** Destination accommodation estimate: per artist, per night. */
     accommodationPerArtistNight: 1000,
     accommodationNights: 2,
+    /**
+     * Manual band fallback fees (used when an address cannot be resolved).
+     * `destination` bands carry no automatic price.
+     */
+    bands: {
+      studio: 0,
+      mid: 770,
+      far: 1610,
+      veryfar: 2450,
+      destination: null,
+    } as Record<string, number | null>,
   },
 } as const;
 
 export const OCCASIONS = [
   { value: "wedding", label: "Wedding" },
-  { value: "matric", label: "Matric farewell" },
   { value: "event", label: "Event" },
+  { value: "lessons", label: "Group lesson" },
+  { value: "matric", label: "Matric farewell" },
+  { value: "editorial", label: "Editorial / shoot" },
+  { value: "engagement", label: "Engagement" },
+  { value: "corporate", label: "Corporate" },
+  { value: "pageant", label: "Pageant" },
 ] as const;
 
 export type Occasion = (typeof OCCASIONS)[number]["value"];
+
+export const OCCASION_LABELS: Record<Occasion, string> = {
+  wedding: "Wedding",
+  event: "Event",
+  lessons: "Group lesson",
+  matric: "Matric farewell",
+  editorial: "Editorial",
+  engagement: "Engagement",
+  corporate: "Corporate",
+  pageant: "Pageant",
+};
+
+export function isBeyondBridalOccasion(
+  occasion: Occasion,
+): occasion is BeyondBridalOccasion {
+  return (BEYOND_BRIDAL_OCCASIONS as readonly string[]).includes(occasion);
+}
 
 export const STYLE_OPTIONS = [
   "Natural & soft",

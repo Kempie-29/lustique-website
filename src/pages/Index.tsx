@@ -282,9 +282,9 @@ export default function Index() {
             <p className="eyebrow">Let's begin</p>
             <h2>Tell us about your day.</h2>
             <p>
-              {activePromotion.active
-                ? activePromotion.description
-                : "Build a live estimate in about two minutes — your investment, before you enquire."}
+              {activePromotion.meta
+                              ? activePromotion.meta.tagline
+                              : "Build a live estimate in about two minutes — your investment, before you enquire."}
             </p>
             <div className="btn-row">
               <Button to="/quote" variant="light" size="lg">

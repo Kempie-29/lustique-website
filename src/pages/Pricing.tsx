@@ -27,14 +27,14 @@ export default function Pricing() {
 
       <section className="section">
         <div className="wrap">
-          {activePromotion.active ? (
-            <Reveal>
-              <div className="panel" style={{ marginBottom: "var(--space-xl)" }}>
-                <p className="eyebrow">Current offer</p>
-                <h2 style={{ fontSize: "var(--step-2)" }}>{activePromotion.label}</h2>
-                <p className="muted" style={{ marginTop: "0.6rem" }}>
-                  {activePromotion.description}
-                </p>
+          {activePromotion.meta ? (
+                      <Reveal>
+                        <div className="panel" style={{ marginBottom: "var(--space-xl)" }}>
+                          <p className="eyebrow">Current offer</p>
+                          <h2 style={{ fontSize: "var(--step-2)" }}>{activePromotion.meta.name}</h2>
+                          <p className="muted" style={{ marginTop: "0.6rem" }}>
+                            {activePromotion.meta.tagline}
+                          </p>
                 <p className="field__hint">
                                   The least-expensive eligible look is the one freed. The bride,
                                   under-12 flower girls and trials are never freed. Minimum

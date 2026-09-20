@@ -1,86 +1,103 @@
 /**
- * Promotions. Exactly ONE active promotion is applied at a time. The engine in
- * `lib/promo.ts` evaluates the active config against an estimate.
+ * Promotions. Exactly ONE promotion is active at a time and it is
+ * user-toggleable from the estimate. The engine in `lib/promo.ts` evaluates the
+ * active config against a live estimate.
+ *
+ * This mirrors the live shapes (the eight `kind`s the live engine understands).
+ * Live fetches the active promo + meta from `/api/promo/active`; a Vite SPA has
+ * no backend, so `loadActivePromotion()` reads the local default below. Swap
+ * that one function for a fetch later and nothing else changes.
  *
  * Thresholds count "full looks" only — one person receiving BOTH hair and
  * makeup. The bride always counts toward the threshold but is never freed, an
  * under-12 flower girl is never freed, and a trial is never freed.
  */
 
-export type PromotionType = "none" | "cheapest-full-look-free" | "percent-off-full-looks";
+export type PromotionKind =
+  | "none"
+  | "cheapestLookFree"
+  | "flatCreditOnMinParty"
+  | "milestoneTiers"
+  | "weekdayDiscount"
+  | "seasonalWindow"
+  | "earlyBirdLeadTime"
+  | "bundledValueAdd";
 
-export interface PromotionConfig {
-  id: string;
-  label: string;
-  type: PromotionType;
-  active: boolean;
-  /** Minimum number of full looks required to unlock the promotion. */
-  minBooks: number;
-  /** Only used by `percent-off-full-looks`. */
-  percent?: number;
-  description: string;
+export interface PromotionMeta {
+  /** Display name, e.g. "Least-expensive look free". */
+  name: string;
+  /** Short supporting line shown beside the toggle. */
+  tagline: string;
 }
 
+export interface MilestoneTier {
+  minPeople: number;
+  /** 100 = the cheapest look is free. */
+  freeLookPercent?: number;
+  travelWaived?: boolean;
+  perkLabel?: string;
+}
+
+export type PromotionConfig =
+  | { id: string; kind: "none" }
+  | { id: string; kind: "cheapestLookFree"; minPeople: number }
+  | { id: string; kind: "flatCreditOnMinParty"; minPeople: number; amount: number }
+  | { id: string; kind: "milestoneTiers"; tiers: MilestoneTier[] }
+  | {
+      id: string;
+      kind: "weekdayDiscount";
+      /** Days the offer applies on, 0 = Sunday … 6 = Saturday. */
+      applyOnDays: number[];
+      amount: number;
+      travelWaived?: boolean;
+    }
+  | { id: string; kind: "seasonalWindow"; startMonth: number; endMonth: number; amount: number }
+  | { id: string; kind: "earlyBirdLeadTime"; minMonthsAhead: number; amount: number }
+  | { id: string; kind: "bundledValueAdd"; minPeople: number; perkLabel: string };
+
+export interface ActivePromotion {
+  config: PromotionConfig;
+  /** Present only when there is a running offer to advertise. */
+  meta: PromotionMeta | null;
+}
+
+/** Sample configs — one per live `kind` — used by tests and admin previews. */
 export const promotionPresets: PromotionConfig[] = [
+  { id: "cheapest-look-free", kind: "cheapestLookFree", minPeople: 4 },
+  { id: "flat-credit", kind: "flatCreditOnMinParty", minPeople: 3, amount: 500 },
   {
-    id: "cheapest-look-free",
-    label: "Least-expensive look free",
-    type: "cheapest-full-look-free",
-    active: true,
-    minBooks: 4,
-    description:
-      "Book hair & makeup for 4+ and the least-expensive look is on us.",
+    id: "milestones",
+    kind: "milestoneTiers",
+    tiers: [
+      { minPeople: 4, freeLookPercent: 100, perkLabel: "Least-expensive look free" },
+      { minPeople: 6, freeLookPercent: 50, travelWaived: true, perkLabel: "Half your travel" },
+    ],
   },
-  {
-    id: "none",
-    label: "No active promotion",
-    type: "none",
-    active: false,
-    minBooks: 0,
-    description: "No promotion currently running.",
-  },
-  {
-    id: "ten-off-party",
-    label: "10% off the party",
-    type: "percent-off-full-looks",
-    active: false,
-    minBooks: 4,
-    percent: 10,
-    description: "Book 4+ full looks and take 10% off the party.",
-  },
-  {
-    id: "fifteen-off-party",
-    label: "15% off the party",
-    type: "percent-off-full-looks",
-    active: false,
-    minBooks: 6,
-    percent: 15,
-    description: "Book 6+ full looks and take 15% off the party.",
-  },
-  {
-    id: "cheapest-look-free-5",
-    label: "Least-expensive look free (5+)",
-    type: "cheapest-full-look-free",
-    active: false,
-    minBooks: 5,
-    description:
-      "Book hair & makeup for 5+ and the least-expensive look is on us.",
-  },
-  {
-    id: "twenty-off-party",
-    label: "20% off the party",
-    type: "percent-off-full-looks",
-    active: false,
-    minBooks: 8,
-    percent: 20,
-    description: "Book 8+ full looks and take 20% off the party.",
-  },
+  { id: "weekday", kind: "weekdayDiscount", applyOnDays: [2, 3, 4], amount: 400 },
+  { id: "off-peak", kind: "seasonalWindow", startMonth: 5, endMonth: 8, amount: 600 },
+  { id: "early-bird", kind: "earlyBirdLeadTime", minMonthsAhead: 9, amount: 500 },
+  { id: "bundle", kind: "bundledValueAdd", minPeople: 5, perkLabel: "Complimentary touch-up kit" },
+  { id: "none", kind: "none" },
 ];
 
-/** The single promotion the estimator will apply. */
-export const activePromotion: PromotionConfig =
-  promotionPresets.find((p) => p.active) ?? promotionPresets[0];
+/**
+ * The single active promotion the estimator offers. Returns the config plus the
+ * meta used by the toggle label; replace with a `/api/promo/active` fetch when a
+ * backend exists.
+ */
+export function loadActivePromotion(): ActivePromotion {
+  return {
+    config: { id: "cheapest-look-free", kind: "cheapestLookFree", minPeople: 4 },
+    meta: {
+      name: "Least-expensive look free",
+      tagline: "Book hair & makeup for 4+ and the least-expensive look is on us.",
+    },
+  };
+}
+
+/** The promotion resolved at load time. */
+export const activePromotion: ActivePromotion = loadActivePromotion();
 
 export function promoTopBarCopy(): string {
-  return `Now booking 2026 & 2027 weddings · Book hair & makeup for 4+ and the least-expensive look is on us`;
+  return "Now booking 2026 & 2027 weddings · Book hair & makeup for 4+ and the least-expensive look is on us";
 }

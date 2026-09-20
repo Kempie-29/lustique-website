@@ -1162,3 +1162,78 @@
   color: var(--ink-soft);
 }
 .policy-block + .policy-block { margin-top: var(--space-lg); }
+
+/* ————— Venue field (quote) ————— */
+.venue-field { display: flex; flex-direction: column; }
+.venue-field__input { position: relative; }
+.venue-suggestions {
+  position: absolute;
+  z-index: 40;
+  left: 0;
+  right: 0;
+  top: calc(100% - 0.6rem);
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem;
+  background: #fff;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  max-height: 16rem;
+  overflow-y: auto;
+}
+.venue-suggestions button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  align-items: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 0.6rem 0.7rem;
+  border-radius: var(--radius);
+  text-align: left;
+  font-size: var(--step--1);
+  color: var(--ink);
+}
+.venue-suggestions button:hover { background: var(--paper-warm); }
+.venue-suggestions__tag {
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rose-deep);
+  white-space: nowrap;
+}
+.destination-panel {
+  background: var(--champagne-soft);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+  margin-bottom: var(--space-sm);
+}
+
+/* ————— Offer toggle ————— */
+.offer-toggle {
+  border: 1px solid var(--line-strong);
+  border-left: 3px solid var(--rose-deep);
+  background: var(--paper-warm);
+  border-radius: var(--radius);
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-md);
+}
+.offer-toggle .checkbox { align-items: flex-start; }
+
+/* ————— Breakdown sections ————— */
+.breakdown__group + .breakdown__group { margin-top: var(--space-sm); }
+.breakdown__section {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0.55rem 0 0.35rem;
+}

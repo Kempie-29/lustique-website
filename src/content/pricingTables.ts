@@ -85,7 +85,7 @@ export const pricingTables: PriceTable[] = [
         })),
         {
           label: "Matric farewell — hair & makeup",
-          price: `${formatZar(PRICES.beyondBridal.matric)} per face`,
+          price: `${formatZar(PRICES.beyondBridal.rates.matric)} per face`,
         },
         {
           label: "Group lesson — under 10 attending",
@@ -103,9 +103,10 @@ export const pricingTables: PriceTable[] = [
       title: "Beyond bridal",
       intro: "Editorial, engagement, corporate and pageant work — flat rate per look.",
       rows: [
-        { label: "Editorial & shoot", price: formatZar(PRICES.beyondBridal.editorial) },
-        { label: "Engagement & corporate", price: formatZar(PRICES.beyondBridal.engagement) },
-        { label: "Pageant", price: formatZar(PRICES.beyondBridal.pageant) },
+        { label: "Editorial & shoot", price: formatZar(PRICES.beyondBridal.rates.editorial) },
+                { label: "Engagement", price: formatZar(PRICES.beyondBridal.rates.engagement) },
+                { label: "Corporate", price: formatZar(PRICES.beyondBridal.rates.corporate) },
+                { label: "Pageant", price: formatZar(PRICES.beyondBridal.rates.pageant) },
       ],
     },
   {

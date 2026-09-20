@@ -4,12 +4,15 @@ import {
   estimate,
   estimateStateLine,
   emptyPartyGroup,
+  emptyHairCounts,
   type EstimateInput,
 } from "@/lib/pricing";
 
 function input(overrides: Partial<EstimateInput> = {}): EstimateInput {
   return { ...createInitialInput(), ...overrides };
 }
+
+const noBride = { makeup: false, hair: false, trial: false, hairLength: "medium" } as const;
 
 describe("pricing — solo bride", () => {
   it("prices short through extra-long hair (R2 690 → R3 290)", () => {
@@ -40,7 +43,7 @@ describe("pricing — bridal party", () => {
   it("prices mixed-length bridesmaids correctly", () => {
     const result = estimate(
       input({
-        bride: { makeup: false, hair: false, trial: false, hairLength: "medium" },
+        bride: noBride,
         bridesmaids: { makeup: 2, hair: 3, hairCounts: { short: 1, medium: 2, long: 0, xlong: 0 } },
       }),
     );
@@ -51,15 +54,15 @@ describe("pricing — bridal party", () => {
   it("prices flower girls by age band", () => {
     const result = estimate(
       input({
-        bride: { makeup: false, hair: false, trial: false, hairLength: "medium" },
+        bride: noBride,
         flowerGirlsUnder12: { makeup: 2, hair: 0, hairCounts: { short: 0, medium: 2, long: 0, xlong: 0 } },
         flowerGirlsOver12: { makeup: 1, hair: 1, hairCounts: { short: 0, medium: 1, long: 0, xlong: 0 } },
       }),
-          );
-          // under12 makeup 2*250 = 500 ; under12 hair 2*250 = 500 ; over12 500 + 495 = 995
-          expect(result.total).toBe(1995);
-        });
-      });
+    );
+    // under12 makeup 2*250 = 500 ; under12 hair 2*250 = 500 ; over12 500 + 495 = 995
+    expect(result.total).toBe(1995);
+  });
+});
 
 describe("pricing — additional artist", () => {
   it("adds R850 only when explicitly requested", () => {
@@ -87,42 +90,105 @@ describe("pricing — large parties are not double counted", () => {
   });
 });
 
-describe("pricing — matric & events", () => {
-  it("charges matric at a flat R750 per face", () => {
-    const nine = estimate(input({ occasion: "matric", lesson: { attendees: 9 } }));
-    const ten = estimate(input({ occasion: "matric", lesson: { attendees: 10 } }));
-    expect(nine.total).toBe(9 * 750);
-    expect(ten.total).toBe(10 * 750);
+describe("pricing — event", () => {
+  it("prices an event through the event fields (guest rate)", () => {
+    const result = estimate(
+      input({
+        occasion: "event",
+        event: { location: "studio", makeup: 2, hair: 0, hairCounts: emptyHairCounts() },
+      }),
+    );
+    expect(result.total).toBe(2 * 550);
+    expect(result.heads).toBe(2);
   });
 
   it("only charges travel for an event when meeting at the venue", () => {
     const atVenue = estimate(
       input({
         occasion: "event",
-        event: { location: "venue", makeup: 2, hair: 0, hairCounts: { short: 0, medium: 0, long: 0, xlong: 0 } },
-        travel: { status: "ok", oneWayKm: 30, roundTripKm: 60, fee: 140, confirmed: true },
+        event: { location: "venue", makeup: 2, hair: 0, hairCounts: emptyHairCounts() },
+        travel: { status: "ok", oneWayKm: 30, roundTripKm: 60, fee: 420, confirmed: true },
       }),
     );
-    expect(atVenue.total).toBe(2 * 550 + 140);
+    expect(atVenue.total).toBe(2 * 550 + 420);
 
     const inStudio = estimate(
       input({
         occasion: "event",
-        event: { location: "studio", makeup: 2, hair: 0, hairCounts: { short: 0, medium: 0, long: 0, xlong: 0 } },
-        travel: { status: "ok", oneWayKm: 30, roundTripKm: 60, fee: 140, confirmed: true },
+        event: { location: "studio", makeup: 2, hair: 0, hairCounts: emptyHairCounts() },
+        travel: { status: "ok", oneWayKm: 30, roundTripKm: 60, fee: 420, confirmed: true },
       }),
     );
     expect(inStudio.total).toBe(2 * 550);
   });
 });
 
+describe("pricing — beyond bridal (flat per face)", () => {
+  it("charges matric R750 a face from the event fields", () => {
+    const result = estimate(
+      input({
+        occasion: "matric",
+        event: { location: "venue", makeup: 9, hair: 0, hairCounts: emptyHairCounts() },
+      }),
+    );
+    expect(result.total).toBe(9 * 750);
+    expect(result.heads).toBe(9);
+  });
+
+  it("prices each beyond-bridal occasion at its own flat rate", () => {
+    const cases = [
+      { occasion: "editorial" as const, rate: 750 },
+      { occasion: "engagement" as const, rate: 650 },
+      { occasion: "corporate" as const, rate: 650 },
+      { occasion: "pageant" as const, rate: 950 },
+    ];
+    for (const c of cases) {
+      const result = estimate(
+        input({
+          occasion: c.occasion,
+          event: { location: "venue", makeup: 4, hair: 2, hairCounts: emptyHairCounts() },
+        }),
+      );
+      // faces = max(makeup, hair) = 4
+      expect(result.total).toBe(4 * c.rate);
+    }
+  });
+});
+
+describe("pricing — group lessons", () => {
+  it("charges a minimum of six faces at R700 under ten", () => {
+    const six = estimate(input({ occasion: "lessons", lesson: { attendees: 6 } }));
+    expect(six.total).toBe(6 * 700);
+
+    const few = estimate(input({ occasion: "lessons", lesson: { attendees: 3 } }));
+    expect(few.total).toBe(6 * 700);
+    expect(few.heads).toBe(6);
+  });
+
+  it("drops to R600 a face at ten or more", () => {
+    const ten = estimate(input({ occasion: "lessons", lesson: { attendees: 10 } }));
+    expect(ten.total).toBe(10 * 600);
+
+    const fifteen = estimate(input({ occasion: "lessons", lesson: { attendees: 15 } }));
+    expect(fifteen.total).toBe(15 * 600);
+  });
+});
+
 describe("pricing — state line", () => {
-  it("describes wedding, lesson and async states", () => {
-    const wedding = input();
+  it("describes wedding, event, lesson and destination states", () => {
+    const wedding = input({ bridesmaids: emptyPartyGroup() });
     expect(estimateStateLine(wedding, estimate(wedding))).toContain("incl. trial & touch-ups");
 
-    const matric = input({ occasion: "matric", lesson: { attendees: 12 } });
-        expect(estimateStateLine(matric, estimate(matric))).toBe("12 faces · matric farewell");
+    const event = input({
+      occasion: "event",
+      event: { location: "venue", makeup: 3, hair: 0, hairCounts: emptyHairCounts() },
+    });
+    expect(estimateStateLine(event, estimate(event))).toBe(
+      "3 faces · approximate event estimate",
+    );
+
+    const lesson = input({ occasion: "lessons", lesson: { attendees: 12 } });
+    expect(estimateStateLine(lesson, estimate(lesson))).toBe("12 attending · group lesson");
   });
 
   it("reports a destination instead of a number", () => {
@@ -140,5 +206,13 @@ describe("helpers", () => {
       hair: 0,
       hairCounts: { short: 0, medium: 0, long: 0, xlong: 0 },
     });
+  });
+
+  it("groups the breakdown into sections", () => {
+    const result = estimate(
+      input({ bridesmaids: { makeup: 1, hair: 0, hairCounts: emptyHairCounts() } }),
+    );
+    expect(result.sections.map((s) => s.label)).toContain("Bride");
+    expect(result.sections.map((s) => s.label)).toContain("Bridesmaids");
   });
 });

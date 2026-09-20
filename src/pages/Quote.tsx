@@ -7,15 +7,17 @@ import { Button } from "@/components/primitives/Button";
 import { Field } from "@/components/primitives/Field";
 import { NumberStepper, ReconcileBlock } from "@/components/quote/Controls";
 import { PartyGroupField } from "@/components/quote/PartyGroupField";
+import { VenueField } from "@/components/quote/VenueField";
 import {
-  DISTANCE_BANDS,
   HAIR_LENGTHS,
   OCCASIONS,
+  OCCASION_LABELS,
   PRICES,
   REFERRAL_OPTIONS,
   STYLE_OPTIONS,
-  type DistanceBand,
+  isBeyondBridalOccasion,
   type HairLength,
+  type Occasion,
 } from "@/content/pricing";
 import { activePromotion } from "@/content/promotions";
 import {
@@ -24,18 +26,12 @@ import {
   estimate,
   estimateStateLine,
   type EstimateInput,
+  type EstimateLine,
   type PartyGroupInput,
 } from "@/lib/pricing";
-import { evaluatePromotion } from "@/lib/promo";
-import { formatTotal, formatZar } from "@/lib/format";
-import {
-  accommodationEstimate,
-  hasMapsKey,
-  resolveDistance,
-  travelFromBand,
-  unknownTravel,
-  type TravelEstimate,
-} from "@/lib/distance";
+import { evaluateActivePromotion } from "@/lib/promo";
+import { formatTotal, formatZar, pluralise } from "@/lib/format";
+import { hasHereKey, unknownTravel, type TravelEstimate } from "@/lib/distance";
 import {
   submitEnquiry,
   validateEnquiry,
@@ -62,12 +58,21 @@ const initialForm: EnquiryForm = {
   flowerGirlsOver12: emptyPartyGroup(),
   extraArtists: 0,
   event: { location: "venue", makeup: 0, hair: 0, hairCounts: emptyHairCounts() },
-  lesson: { attendees: 1 },
+  lesson: { attendees: 6 },
   style: "",
   inspirationUrl: "",
   notes: "",
   consent: false,
+  promoToggle: false,
 };
+
+function monthsUntil(iso: string): number | null {
+  if (!iso) return null;
+  const target = new Date(iso);
+  if (Number.isNaN(target.getTime())) return null;
+  const now = new Date();
+  return (target.getFullYear() - now.getFullYear()) * 12 + (target.getMonth() - now.getMonth());
+}
 
 export default function Quote() {
   const navigate = useNavigate();
@@ -77,6 +82,8 @@ export default function Quote() {
   const [status, setStatus] = useState<{ type: "error" | "success"; message: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const statusRef = useRef<HTMLDivElement>(null);
+
+  const hereKeyReady = hasHereKey();
 
   const setField = <K extends keyof EnquiryForm>(key: K, value: EnquiryForm[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -99,23 +106,39 @@ export default function Quote() {
   );
 
   const result = useMemo(() => estimate(estimateInput), [estimateInput]);
-  const promo = useMemo(() => evaluatePromotion(activePromotion, result), [result]);
-  const total = result.total + promo.discount;
+
+  const promoEval = useMemo(() => {
+    const date = form.weddingDate;
+    return evaluateActivePromotion(activePromotion, result, {
+      weddingDayOfWeek: date ? new Date(date).getDay() : null,
+      weddingMonth: date ? new Date(date).getMonth() + 1 : null,
+      monthsUntilWedding: monthsUntil(date),
+    });
+  }, [activePromotion, result, form.weddingDate]);
+
+  const promoOn = form.promoToggle;
+  const promoLines = promoOn ? promoEval.lines : [];
+  const promoDiscount = promoOn ? promoEval.discount : 0;
+  const total = result.total + promoDiscount;
+
   const isWeddingLike = form.occasion === "wedding";
   const stateLine = estimateStateLine(estimateInput, result);
+  const showOffer = activePromotion.meta != null && activePromotion.config.kind !== "none";
 
-  const panelLines = [...result.lines, ...promo.lines];
+  const panelLines = [...result.lines, ...promoLines];
+  const grouped = useMemo(() => {
+    const map: { section: string; lines: EstimateLine[] }[] = [];
+    for (const line of panelLines) {
+      const existing = map.find((g) => g.section === line.section);
+      if (existing) existing.lines.push(line);
+      else map.push({ section: line.section, lines: [line] });
+    }
+    return map;
+  }, [panelLines]);
 
-  const onFindVenue = async () => {
-    const address = form.venueAddress || form.venueName;
-    const next = await resolveDistance(address);
-    setTravel(next);
-  };
-
-  const onBandChange = (band: DistanceBand | "") => {
-    setField("distanceBand", band);
-    setTravel(travelFromBand(band === "" ? null : band));
-  };
+  const beyondRate = isBeyondBridalOccasion(form.occasion)
+    ? PRICES.beyondBridal.rates[form.occasion]
+    : null;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,7 +164,7 @@ export default function Quote() {
       submittedAt: new Date().toISOString(),
       estimate: {
         subtotal: result.subtotal,
-        discount: promo.discount,
+        discount: promoDiscount,
         total,
         heads: result.heads,
         isDestination: result.isDestination,
@@ -190,6 +213,20 @@ export default function Quote() {
                 <div className="estimate-bar__figure tabular">{formatTotal(total, isWeddingLike)}</div>
               </div>
 
+              {showOffer ? (
+                <div className="offer-toggle" data-field="promoToggle">
+                  <label className="checkbox">
+                    <input
+                      type="checkbox"
+                      checked={form.promoToggle}
+                      onChange={(e) => setField("promoToggle", e.target.checked)}
+                    />
+                    Apply the “{activePromotion.meta?.name}” offer to my estimate
+                    {activePromotion.meta?.tagline ? ` — ${activePromotion.meta.tagline}` : ""}
+                  </label>
+                </div>
+              ) : null}
+
               <form onSubmit={onSubmit} noValidate>
                 {/* 1 · Occasion */}
                 <div className="form-section">
@@ -208,7 +245,7 @@ export default function Quote() {
                           name="occasion"
                           value={o.value}
                           checked={form.occasion === o.value}
-                          onChange={() => setField("occasion", o.value)}
+                          onChange={() => setField("occasion", o.value as Occasion)}
                         />
                         {o.label}
                       </label>
@@ -284,7 +321,7 @@ export default function Quote() {
                 </div>
 
                 {/* 3 · Your big day */}
-                {form.occasion !== "matric" && (
+                {form.occasion !== "lessons" && (
                   <div className="form-section">
                     <div className="form-section__head">
                       <span className="form-section__num">3</span>
@@ -308,79 +345,16 @@ export default function Quote() {
                         </Field>
                       </div>
                     )}
-                    <div data-field="venue">
-                      <Field
-                        label="Venue name or address"
-                        required
-                        htmlFor="venueName"
-                        error={errors.venue}
-                        hint="Start typing — we'll pin it on a map, or estimate travel from the distance bands."
-                      >
-                        <input
-                          id="venueName"
-                          type="text"
-                          value={form.venueName}
-                          aria-invalid={!!errors.venue}
-                          onChange={(e) => setField("venueName", e.target.value)}
-                        />
-                      </Field>
-                    </div>
-                    <Field label="Venue address" htmlFor="venueAddress" hint="Street, suburb, city.">
-                      <input
-                        id="venueAddress"
-                        type="text"
-                        value={form.venueAddress}
-                        onChange={(e) => setField("venueAddress", e.target.value)}
-                      />
-                    </Field>
-                    <div className="btn-row" style={{ marginBottom: "1rem" }}>
-                      <Button variant="outline" size="sm" onClick={onFindVenue}>
-                        Find venue on map
-                      </Button>
-                    </div>
-                    {travel.status === "ok" && travel.confirmed && (
-                                          <p className="field__hint">
-                                            {travel.roundTripKm != null
-                                              ? `About ${Math.round(travel.roundTripKm)} km round trip · `
-                                              : ""}
-                                            {travel.fee && travel.fee > 0
-                                              ? `travel ${formatZar(travel.fee)}`
-                                              : "travel included"}
-                                          </p>
-                                        )}
-                    {travel.status === "destination" && (
-                                          <p className="field__hint">
-                                            That's a destination wedding for us — we'll tailor the logistics with you
-                                            rather than price travel automatically. As a guide, accommodation for{" "}
-                                            {1 + form.extraArtists}{" "}
-                                            {1 + form.extraArtists === 1 ? "artist" : "artists"} for two nights is
-                                            about {formatZar(accommodationEstimate(1 + form.extraArtists))}.
-                                          </p>
-                                        )}
-                    {travel.status === "unknown" && (
-                      <Field
-                        label="How far is the venue?"
-                        htmlFor="distanceBand"
-                        hint={
-                          hasMapsKey()
-                            ? "We couldn't resolve the address — choose a band and we'll confirm travel."
-                            : "Travel is confirmed with you before booking."
-                        }
-                      >
-                        <select
-                          id="distanceBand"
-                          value={form.distanceBand}
-                          onChange={(e) => onBandChange(e.target.value as DistanceBand | "")}
-                        >
-                          <option value="">Travel fee to be confirmed</option>
-                          {DISTANCE_BANDS.map((b) => (
-                            <option key={b.value} value={b.value}>
-                              {b.label}
-                            </option>
-                          ))}
-                        </select>
-                      </Field>
-                    )}
+                    <VenueField
+                      form={form}
+                      setField={setField}
+                      travel={travel}
+                      setTravel={setTravel}
+                      heads={result.heads}
+                      errors={errors}
+                      hasKey={hereKeyReady}
+                      requireVenue={form.occasion === "wedding" || form.occasion === "event"}
+                    />
                   </div>
                 )}
 
@@ -451,7 +425,7 @@ export default function Quote() {
                   </div>
                 )}
 
-                {/* 5 · Bridal party / group */}
+                {/* 5 · Bridal party (wedding only) */}
                 {form.occasion === "wedding" && (
                   <div className="form-section">
                     <div className="form-section__head">
@@ -506,61 +480,14 @@ export default function Quote() {
                   </div>
                 )}
 
-                {form.occasion === "matric" && (
+                {/* 6 · Event / beyond-bridal faces */}
+                {(form.occasion === "event" || isBeyondBridalOccasion(form.occasion)) && (
                   <div className="form-section">
                     <div className="form-section__head">
-                      <span className="form-section__num">5</span>
-                      <h3>Your group</h3>
-                    </div>
-                    <Field
-                                          label="How many matriculants are we doing?"
-                                          htmlFor="lessonAttendees"
-                                          hint={`${formatZar(PRICES.beyondBridal.matric)} per face — hair & makeup included.`}
-                                        >
-                                          <NumberStepper
-                                            value={form.lesson.attendees}
-                                            min={1}
-                                            max={40}
-                                            ariaLabel="matriculants"
-                                            onChange={(v) => setField("lesson", { attendees: v })}
-                                          />
-                                        </Field>
-                  </div>
-                )}
-
-                {/* 6 · Additional artist */}
-                <div className="form-section">
-                  <div className="form-section__head">
-                    <span className="form-section__num">6</span>
-                    <h3>Additional artist</h3>
-                  </div>
-                  <div className="radio-cards" role="radiogroup" aria-label="Additional artist">
-                    {([0, 1, 2] as const).map((n) => (
-                      <label
-                        key={n}
-                        className={`radio-card ${form.extraArtists === n ? "is-active" : ""}`}
-                      >
-                        <input
-                          type="radio"
-                          name="extraArtists"
-                          checked={form.extraArtists === n}
-                          onChange={() => setField("extraArtists", n)}
-                        />
-                        {n === 0 ? "No" : `Yes — ${n} extra`}
-                      </label>
-                    ))}
-                  </div>
-                  <p className="field__hint">
-                    Only added if you ask for them · {formatZar(PRICES.extraArtist)} each.
-                  </p>
-                </div>
-
-                {/* 7 · Event details */}
-                {form.occasion === "event" && (
-                  <div className="form-section">
-                    <div className="form-section__head">
-                      <span className="form-section__num">7</span>
-                      <h3>Who needs makeup &amp; hair</h3>
+                      <span className="form-section__num">
+                        {isBeyondBridalOccasion(form.occasion) ? "5" : "7"}
+                      </span>
+                      <h3>{OCCASION_LABELS[form.occasion]}</h3>
                     </div>
                     <div className="radio-cards" role="radiogroup" aria-label="Event location">
                       <label className={`radio-card ${form.event.location === "venue" ? "is-active" : ""}`}>
@@ -607,25 +534,82 @@ export default function Quote() {
                         />
                       </div>
                     </div>
-                    {eventHairReconcile && (
+                    {beyondRate != null ? (
+                      <p className="field__hint" style={{ marginTop: "0.6rem" }}>
+                        {formatZar(beyondRate)} per face — hair &amp; makeup included.
+                      </p>
+                    ) : null}
+                    {eventHairReconcile && beyondRate == null && (
                       <div style={{ marginTop: "1rem" }}>
                         <ReconcileBlock
                           noun="event"
                           hairCount={form.event.hair}
                           counts={form.event.hairCounts}
-                          onChange={(hairCounts) =>
-                            setField("event", { ...form.event, hairCounts })
-                          }
+                          onChange={(hairCounts) => setField("event", { ...form.event, hairCounts })}
                         />
                       </div>
                     )}
                   </div>
                 )}
 
+                {/* 6 · Group lesson */}
+                {form.occasion === "lessons" && (
+                  <div className="form-section">
+                    <div className="form-section__head">
+                      <span className="form-section__num">5</span>
+                      <h3>Your group</h3>
+                    </div>
+                    <Field
+                      label="How many guests are attending?"
+                      htmlFor="lessonAttendees"
+                      hint={`Minimum ${PRICES.lesson.minAttendees}. ${formatZar(
+                        PRICES.lesson.under10,
+                      )} a face under ${PRICES.lesson.threshold}, ${formatZar(
+                        PRICES.lesson.tenPlus,
+                      )} at ${PRICES.lesson.threshold}+.`}
+                    >
+                      <NumberStepper
+                        value={form.lesson.attendees}
+                        min={1}
+                        max={40}
+                        ariaLabel="lesson attendees"
+                        onChange={(v) => setField("lesson", { attendees: v })}
+                      />
+                    </Field>
+                  </div>
+                )}
+
+                {/* Additional artist */}
+                <div className="form-section">
+                  <div className="form-section__head">
+                    <span className="form-section__num">6</span>
+                    <h3>Additional artist</h3>
+                  </div>
+                  <div className="radio-cards" role="radiogroup" aria-label="Additional artist">
+                    {([0, 1, 2] as const).map((n) => (
+                      <label
+                        key={n}
+                        className={`radio-card ${form.extraArtists === n ? "is-active" : ""}`}
+                      >
+                        <input
+                          type="radio"
+                          name="extraArtists"
+                          checked={form.extraArtists === n}
+                          onChange={() => setField("extraArtists", n)}
+                        />
+                        {n === 0 ? "No" : `Yes — ${n} extra`}
+                      </label>
+                    ))}
+                  </div>
+                  <p className="field__hint">
+                    Only added if you ask for them · {formatZar(PRICES.extraArtist)} each.
+                  </p>
+                </div>
+
                 {/* 8 · Your vision */}
                 <div className="form-section">
                   <div className="form-section__head">
-                    <span className="form-section__num">8</span>
+                    <span className="form-section__num">7</span>
                     <h3>Your vision</h3>
                   </div>
                   <Field label="Style" htmlFor="style">
@@ -658,7 +642,7 @@ export default function Quote() {
                 {/* 9 · Consent + send */}
                 <div className="form-section">
                   <div className="form-section__head">
-                    <span className="form-section__num">9</span>
+                    <span className="form-section__num">8</span>
                     <h3>Consent &amp; send</h3>
                   </div>
                   <div data-field="consent">
@@ -711,7 +695,7 @@ export default function Quote() {
                       hello@lustiqueco.co.za and we'll take care of the rest.
                     </p>
                   </noscript>
-                  <p className="serif-italic" style={{ marginTop: "1.2rem", color: "var(--rose-ink)" }}>
+                  <p className="serif-italic" style={{ marginTop: "1.2rem" }}>
                     Blessings, The Lustique Cosmetology Team
                   </p>
                 </div>
@@ -725,9 +709,13 @@ export default function Quote() {
                   <h2>What's in your estimate</h2>
                 </div>
 
-                {promo.applied && promo.perkLabel ? (
+                {promoOn && promoEval.perks.length > 0 ? (
                   <div className="perk-pills">
-                    <span className="perk-pill">{promo.perkLabel}</span>
+                    {promoEval.perks.map((perk) => (
+                      <span key={perk} className="perk-pill">
+                        {perk}
+                      </span>
+                    ))}
                   </div>
                 ) : null}
 
@@ -737,15 +725,20 @@ export default function Quote() {
                   </p>
                 ) : (
                   <div className="breakdown__list">
-                    {panelLines.map((line) => (
-                      <div
-                        key={line.id}
-                        className={`breakdown__row ${
-                          line.amount < 0 ? "breakdown__row--promo" : ""
-                        }`}
-                      >
-                        <span>{line.label}</span>
-                        <span className="amt">{formatZar(line.amount)}</span>
+                    {grouped.map((group) => (
+                      <div key={group.section} className="breakdown__group">
+                        <h4 className="breakdown__section">{group.section}</h4>
+                        {group.lines.map((line) => (
+                          <div
+                            key={line.id}
+                            className={`breakdown__row ${
+                              line.amount < 0 ? "breakdown__row--promo" : ""
+                            }`}
+                          >
+                            <span>{line.label}</span>
+                            <span className="amt">{formatZar(line.amount)}</span>
+                          </div>
+                        ))}
                       </div>
                     ))}
                   </div>
@@ -761,6 +754,9 @@ export default function Quote() {
                 {result.isDestination ? (
                   <p className="field__hint" style={{ marginTop: "0.6rem" }}>
                     Destination — we'll tailor this with you.
+                    {result.heads > 0
+                      ? ` For ${result.heads} ${pluralise(result.heads, "person", "people")}.`
+                      : ""}
                   </p>
                 ) : travel.status === "unknown" ? (
                   <p className="field__hint" style={{ marginTop: "0.6rem" }}>

@@ -8,7 +8,7 @@
  * requires no rework.
  */
 
-import type { DistanceBand, Occasion } from "@/content/pricing";
+import { isBeyondBridalOccasion, type DistanceBand, type Occasion } from "@/content/pricing";
 import {
   placedHairTotal,
   type BrideInput,
@@ -38,11 +38,13 @@ export interface EnquiryForm {
   extraArtists: 0 | 1 | 2;
   event: EventInput;
   lesson: { attendees: number };
-  style: string;
-  inspirationUrl: string;
-  notes: string;
-  consent: boolean;
-}
+    style: string;
+    inspirationUrl: string;
+    notes: string;
+    consent: boolean;
+    /** Whether the client chose to apply the active offer to their estimate. */
+    promoToggle: boolean;
+  }
 
 export interface EnquiryPayload extends EnquiryForm {
   submittedAt: string;
@@ -85,17 +87,23 @@ export function validateEnquiry(form: EnquiryForm): EnquiryErrors {
   if (!form.mobile.trim()) errors.mobile = "Please add a mobile or WhatsApp number.";
 
   if (form.occasion === "wedding") {
-    if (!form.weddingDate) errors.weddingDate = "Please choose your wedding date.";
-    if (!form.venueName.trim() && !form.venueAddress.trim())
-      errors.venue = "Please add your venue name or address.";
-    if (!form.bride.makeup && !form.bride.hair)
-      errors.brideServices = "Choose makeup, hair, or both for the bride.";
-  }
-
-  if (form.occasion === "event") {
-    if (!form.venueName.trim() && !form.venueAddress.trim())
+      if (!form.weddingDate) errors.weddingDate = "Please choose your wedding date.";
+      if (!form.venueName.trim() && !form.venueAddress.trim())
+        errors.venue = "Please add your venue name or address.";
+      if (!form.bride.makeup && !form.bride.hair)
+        errors.brideServices = "Choose makeup, hair, or both for the bride.";
+    }
+  
+    // Event and beyond-bridal occasions meet away from the studio by default, so
+    // they need a venue; a group lesson does not.
+    if (
+      (form.occasion === "event" || isBeyondBridalOccasion(form.occasion)) &&
+      form.event.location === "venue" &&
+      !form.venueName.trim() &&
+      !form.venueAddress.trim()
+    ) {
       errors.venue = "Please add the venue name or address.";
-  }
+    }
 
   const groupErrors: [keyof EnquiryErrors, PartyGroupInput | FlowerGirlsUnder12Input, string][] = [
     ["bridesmaidsHair", form.bridesmaids, "bridesmaid"],
@@ -156,4 +164,19 @@ export async function submitEnquiry(payload: EnquiryPayload): Promise<SubmitResu
     /* storage unavailable — the console log above is still the record */
   }
   return { ok: true, message: "Your enquiry is with us." };
-}
+  }
+  
+  export interface VenueMatchLog {
+    query: string;
+    matched: boolean;
+    source: "directory" | "here" | "band" | "none";
+    at: string;
+  }
+  
+  /**
+   * Optional analytics hook for venue resolution. There is no backend yet, so
+   * this is a no-op; wire it to `/api/venue-match-log` later with no other change.
+   */
+  export async function logVenueMatch(entry: VenueMatchLog): Promise<void> {
+    void entry;
+  }

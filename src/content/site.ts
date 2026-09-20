@@ -29,7 +29,7 @@ export const site = {
     },
   
     // Studio coordinates used as the travel-calculation origin (live site).
-    coords: { lat: -25.8062, lng: 28.2652 },
+        coords: { lat: -25.7986, lng: 28.3127 },
 
   phone: "+27 67 925 3894",
   phoneDisplay: "067 925 3894",

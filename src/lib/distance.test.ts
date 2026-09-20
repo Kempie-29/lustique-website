@@ -1,7 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 import {
   accommodationEstimate,
+  artistsForHeads,
   computeTravel,
+  destinationIndicative,
   haversineKm,
   travelFromBand,
   unknownTravel,
@@ -16,9 +18,11 @@ describe("distance — confirmed estimates", () => {
     expect(computeTravel(20).status).toBe("ok");
   });
 
-  it("charges R7 per km round trip beyond 40 km", () => {
-    // 30 km one way = 60 km round trip -> 20 km chargeable -> 140
-    expect(computeTravel(30).fee).toBe(140);
+  it("charges R7/km on the whole round trip once past 40 km", () => {
+    // 30 km one way = 60 km round trip -> 60 * 7 = 420
+    expect(computeTravel(30).fee).toBe(420);
+    // 25 km one way = 50 km round trip -> 350
+    expect(computeTravel(25).fee).toBe(350);
   });
 
   it("treats >200 km one way as a destination with no travel price", () => {
@@ -30,6 +34,27 @@ describe("distance — confirmed estimates", () => {
   it("stays unknown without a resolvable distance", () => {
     expect(computeTravel(0).status).toBe("unknown");
     expect(unknownTravel().fee).toBeNull();
+  });
+});
+
+describe("distance — destination indicative", () => {
+  it("uses the live artist heuristic for accommodation", () => {
+    expect(artistsForHeads(4)).toBe(1);
+    expect(artistsForHeads(5)).toBe(2);
+    expect(artistsForHeads(8)).toBe(2);
+    expect(artistsForHeads(9)).toBe(3);
+  });
+
+  it("prices travel at R7/km round trip plus accommodation per artist", () => {
+    const big = destinationIndicative(300, 9);
+    expect(big.travelEstimate).toBe(300 * 2 * 7);
+    expect(big.artists).toBe(3);
+    expect(big.accommodationEstimate).toBe(3 * 1000 * 2);
+
+    const small = destinationIndicative(250, 4);
+    expect(small.travelEstimate).toBe(250 * 2 * 7);
+    expect(small.artists).toBe(1);
+    expect(small.accommodationEstimate).toBe(2000);
   });
 });
 
@@ -63,10 +88,14 @@ describe("distance — haversine", () => {
   it("is zero at the origin", () => {
     expect(haversineKm(ORIGIN, ORIGIN)).toBe(0);
   });
+
+  it("uses the live studio origin", () => {
+    expect(ORIGIN).toEqual({ lat: -25.7986, lng: 28.3127 });
+  });
 });
 
 describe("distance — no key", () => {
-  it("never invents a distance without a Maps key", async () => {
+  it("never invents a distance without a HERE key or directory hit", async () => {
     const spy = vi.spyOn(console, "info").mockImplementation(() => {});
     const result = await resolveDistance("Some Venue, Pretoria");
     expect(result.status).toBe("unknown");

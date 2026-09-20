@@ -6,7 +6,6 @@ import { Button } from "@/components/primitives/Button";
 import { Field } from "@/components/primitives/Field";
 import { Monogram } from "@/components/shell/Monogram";
 import { directionsLink, site, whatsappLink } from "@/content/site";
-import { hasMapsKey, getMapsApiKey } from "@/lib/distance";
 import {
   submitContact,
   validateContact,
@@ -42,9 +41,10 @@ export default function Contact() {
     }
   };
 
-  const mapsKey = getMapsApiKey();
-
-  return (
+  const { lat, lng } = site.coords;
+    const mapBbox = `${lng - 0.012},${lat - 0.009},${lng + 0.012},${lat + 0.009}`;
+  
+    return (
     <>
       <Seo
         title="Contact"
@@ -106,29 +106,19 @@ export default function Contact() {
               </div>
 
               <div className="map-frame" style={{ marginTop: "var(--space-lg)" }}>
-                {hasMapsKey() && mapsKey ? (
-                  <iframe
-                    title={`Map showing ${site.name}`}
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    src={`https://www.google.com/maps/embed/v1/place?key=${mapsKey}&q=${encodeURIComponent(
-                      site.address.full,
-                    )}`}
-                  />
-                ) : (
-                  <div className="map-placeholder">
-                    <Monogram mark="LC" />
-                    <p className="muted" style={{ marginTop: "1rem" }}>
-                      An interactive map appears here once a Maps key is configured.
-                      In the meantime, use{" "}
-                      <a href={directionsLink()} target="_blank" rel="noopener" style={{ textDecoration: "underline" }}>
-                        directions to our studio
-                      </a>
-                      .
-                    </p>
-                  </div>
-                )}
-              </div>
+                              <iframe
+                                title={`Map showing ${site.name}`}
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                                src={`https://www.openstreetmap.org/export/embed.html?bbox=${mapBbox}&layer=mapnik&marker=${lat},${lng}`}
+                              />
+                              <p className="muted" style={{ marginTop: "0.75rem" }}>
+                                <Monogram mark="LC" />{" "}
+                                <a href={directionsLink()} target="_blank" rel="noopener" style={{ textDecoration: "underline" }}>
+                                  Directions to our studio
+                                </a>
+                              </p>
+                            </div>
             </div>
 
             <div className="panel">
