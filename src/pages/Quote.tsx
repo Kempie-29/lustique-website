@@ -29,6 +29,7 @@ import {
 import { evaluatePromotion } from "@/lib/promo";
 import { formatTotal, formatZar } from "@/lib/format";
 import {
+  accommodationEstimate,
   hasMapsKey,
   resolveDistance,
   travelFromBand,
@@ -338,19 +339,24 @@ export default function Quote() {
                       </Button>
                     </div>
                     {travel.status === "ok" && travel.confirmed && (
-                      <p className="field__hint">
-                        About {Math.round(travel.roundTripKm ?? 0)} km round trip ·{" "}
-                        {travel.fee && travel.fee > 0
-                          ? `travel ${formatZar(travel.fee)}`
-                          : "travel included"}
-                      </p>
-                    )}
+                                          <p className="field__hint">
+                                            {travel.roundTripKm != null
+                                              ? `About ${Math.round(travel.roundTripKm)} km round trip · `
+                                              : ""}
+                                            {travel.fee && travel.fee > 0
+                                              ? `travel ${formatZar(travel.fee)}`
+                                              : "travel included"}
+                                          </p>
+                                        )}
                     {travel.status === "destination" && (
-                      <p className="field__hint">
-                        That's a destination wedding for us — we'll tailor the logistics with you
-                        rather than price travel automatically.
-                      </p>
-                    )}
+                                          <p className="field__hint">
+                                            That's a destination wedding for us — we'll tailor the logistics with you
+                                            rather than price travel automatically. As a guide, accommodation for{" "}
+                                            {1 + form.extraArtists}{" "}
+                                            {1 + form.extraArtists === 1 ? "artist" : "artists"} for two nights is
+                                            about {formatZar(accommodationEstimate(1 + form.extraArtists))}.
+                                          </p>
+                                        )}
                     {travel.status === "unknown" && (
                       <Field
                         label="How far is the venue?"
@@ -507,20 +513,18 @@ export default function Quote() {
                       <h3>Your group</h3>
                     </div>
                     <Field
-                      label="How many are attending?"
-                      htmlFor="lessonAttendees"
-                      hint={`${formatZar(PRICES.lesson.under10)} each under 10 · ${formatZar(
-                        PRICES.lesson.tenPlus,
-                      )} each for 10 or more.`}
-                    >
-                      <NumberStepper
-                        value={form.lesson.attendees}
-                        min={1}
-                        max={40}
-                        ariaLabel="attendees"
-                        onChange={(v) => setField("lesson", { attendees: v })}
-                      />
-                    </Field>
+                                          label="How many matriculants are we doing?"
+                                          htmlFor="lessonAttendees"
+                                          hint={`${formatZar(PRICES.beyondBridal.matric)} per face — hair & makeup included.`}
+                                        >
+                                          <NumberStepper
+                                            value={form.lesson.attendees}
+                                            min={1}
+                                            max={40}
+                                            ariaLabel="matriculants"
+                                            onChange={(v) => setField("lesson", { attendees: v })}
+                                          />
+                                        </Field>
                   </div>
                 )}
 

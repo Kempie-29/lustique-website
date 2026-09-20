@@ -4,30 +4,32 @@
    ============================================================ */
 
 :root {
-  /* — Colour — */
-  --ivory: #fbf8f3;
-  --ivory-deep: #f4ede3;
-  --champagne: #e4d2b8;
+  /* — Colour — aligned to the live Lustique Co. palette — */
+  --ivory: #faf6f0;
+  --ivory-deep: #f4ece1;
+  --champagne: #e8d5b7;
   --champagne-soft: #efe4d2;
+  --blush: #efd2c5;
   --rose: #c08a86;
-  --rose-deep: #a0625e;
+  --rose-deep: #9e5f58;
   --rose-ink: #7c4643;
-  --burgundy: #6e2b33;
+  --burgundy: #7a2e3a;
+  --mocha: #5c4332;
   --green: #4f7a5b;
   --green-deep: #3e6249;
 
-  --ink: #2b2320;
-  --ink-soft: #5a4f49;
+  --ink: #3a2e26;
+  --ink-soft: #4a3f37;
   --ink-faint: #8a7d74;
-  --line: rgba(43, 35, 32, 0.12);
-  --line-strong: rgba(43, 35, 32, 0.22);
+  --line: rgba(58, 46, 38, 0.12);
+  --line-strong: rgba(58, 46, 38, 0.22);
 
   --paper: #ffffff;
   --paper-warm: #fffdf9;
 
   /* — Type — */
   --font-display: "Cormorant Garamond", "Times New Roman", serif;
-  --font-body: "Jost", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Manrope", "Helvetica Neue", Arial, sans-serif;
 
   --step--1: clamp(0.78rem, 0.76rem + 0.1vw, 0.84rem);
   --step-0: clamp(0.98rem, 0.95rem + 0.15vw, 1.06rem);

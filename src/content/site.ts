@@ -19,16 +19,17 @@ export const site = {
   url: "https://www.lustiqueco.co.za",
 
   address: {
-    suburb: "La Montagne",
-    city: "Pretoria",
-    region: "Gauteng",
-    country: "South Africa",
-    countryCode: "ZA",
-    full: "La Montagne, Pretoria, Gauteng, South Africa",
-  },
-
-  // Approximate suburb centroid used as the travel-calculation origin.
-  coords: { lat: -25.7986, lng: 28.3127 },
+      street: "242 Frangipani Street",
+      suburb: "La Montagne",
+      city: "Pretoria",
+      region: "Gauteng",
+      country: "South Africa",
+      countryCode: "ZA",
+      full: "242 Frangipani Street, La Montagne, Pretoria, Gauteng, South Africa",
+    },
+  
+    // Studio coordinates used as the travel-calculation origin (live site).
+    coords: { lat: -25.8062, lng: 28.2652 },
 
   phone: "+27 67 925 3894",
   phoneDisplay: "067 925 3894",

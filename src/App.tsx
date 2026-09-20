@@ -9,7 +9,6 @@ import Guides from "@/pages/Guides";
 import Index from "@/pages/Index";
 import Journal from "@/pages/Journal";
 import JournalDetail from "@/pages/JournalDetail";
-import OfferTerms from "@/pages/OfferTerms";
 import Portfolio from "@/pages/Portfolio";
 import Pricing from "@/pages/Pricing";
 import Privacy from "@/pages/Privacy";
@@ -43,7 +42,6 @@ const App = () => (
         <Route path="/contact" element={<Contact />} />
         <Route path="/vendors" element={<Vendors />} />
 
-        <Route path="/offer-terms" element={<OfferTerms />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
 

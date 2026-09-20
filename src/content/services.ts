@@ -65,11 +65,11 @@ export const services: ServiceDetail[] = [
     summary:
       "Beyond weddings: matric farewells, milestone birthdays and events, at the venue or in our studio.",
     includes: [
-      "Event makeup and hair, priced per person",
-      "Meet at the venue, or come to the studio",
-      "Group lessons for matric farewells",
-      "Travel calculated and confirmed up front",
-    ],
+          "Event makeup and hair, priced per person",
+          "Matric farewells at a flat rate per face",
+          "Meet at the venue, or come to the studio",
+          "Travel calculated and confirmed up front",
+        ],
     href: "/quote",
   },
 ];

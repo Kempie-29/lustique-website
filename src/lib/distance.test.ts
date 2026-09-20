@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import {
+  accommodationEstimate,
   computeTravel,
   haversineKm,
   travelFromBand,
@@ -33,10 +34,28 @@ describe("distance — confirmed estimates", () => {
 });
 
 describe("distance — band fallback", () => {
-  it("only the 200+ band is decisive", () => {
+  it("gives each closed band its confirmed fee", () => {
+    expect(travelFromBand("0-20").status).toBe("ok");
+    expect(travelFromBand("0-20").fee).toBe(0);
+    expect(travelFromBand("20-80").fee).toBe(770);
+    expect(travelFromBand("80-150").fee).toBe(1610);
+    expect(travelFromBand("150-200").fee).toBe(2450);
+  });
+
+  it("treats 200+ as a destination with no automatic fee", () => {
     expect(travelFromBand("200+").status).toBe("destination");
-    expect(travelFromBand("20-40").status).toBe("unknown");
-    expect(travelFromBand("20-40").fee).toBeNull();
+    expect(travelFromBand("200+").fee).toBeNull();
+  });
+
+  it("stays unknown without a band", () => {
+    expect(travelFromBand(null).status).toBe("unknown");
+  });
+});
+
+describe("distance — destination accommodation", () => {
+  it("estimates two nights per artist at R1 000 a night", () => {
+    expect(accommodationEstimate(2)).toBe(4000);
+    expect(accommodationEstimate(0)).toBe(0);
   });
 });
 

@@ -36,15 +36,11 @@ export default function Pricing() {
                   {activePromotion.description}
                 </p>
                 <p className="field__hint">
-                  The least-expensive eligible look is the one freed. The bride,
-                  under-12 flower girls and trials are never freed.
-                </p>
-                <div className="btn-row" style={{ marginTop: "1.1rem" }}>
-                  <Button to="/offer-terms" variant="outline" size="sm">
-                    Read the full offer terms
-                  </Button>
-                </div>
-              </div>
+                                  The least-expensive eligible look is the one freed. The bride,
+                                  under-12 flower girls and trials are never freed. Minimum
+                                  bookings and any conditions are confirmed with your estimate.
+                                </p>
+                              </div>
             </Reveal>
           ) : null}
 

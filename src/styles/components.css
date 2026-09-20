@@ -732,7 +732,7 @@
   font-size: var(--step-0);
 }
 .radio-card input { accent-color: var(--rose-deep); }
-.radio-card.is-active { border-color: var(--rose-deep); background: #fff; box-shadow: 0 0 0 3px rgba(160, 98, 94, 0.12); }
+.radio-card.is-active { border-color: var(--rose-deep); background: #fff; box-shadow: 0 0 0 3px rgba(158, 95, 88, 0.12); }
 
 .stepper { display: inline-flex; align-items: center; gap: 0.5rem; }
 .stepper button {

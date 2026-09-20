@@ -81,8 +81,6 @@ export const promotionPresets: PromotionConfig[] = [
 export const activePromotion: PromotionConfig =
   promotionPresets.find((p) => p.active) ?? promotionPresets[0];
 
-export const offerTermsHref = "/offer-terms";
-
 export function promoTopBarCopy(): string {
   return `Now booking 2026 & 2027 weddings · Book hair & makeup for 4+ and the least-expensive look is on us`;
 }

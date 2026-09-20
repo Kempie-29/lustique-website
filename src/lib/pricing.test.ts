@@ -55,11 +55,11 @@ describe("pricing — bridal party", () => {
         flowerGirlsUnder12: { makeup: 2, hair: 0, hairCounts: { short: 0, medium: 2, long: 0, xlong: 0 } },
         flowerGirlsOver12: { makeup: 1, hair: 1, hairCounts: { short: 0, medium: 1, long: 0, xlong: 0 } },
       }),
-    );
-    // under12 makeup 2*250 = 500 ; under12 hair 2*250 = 500 ; over12 550 + 495 = 1045
-    expect(result.total).toBe(2045);
-  });
-});
+          );
+          // under12 makeup 2*250 = 500 ; under12 hair 2*250 = 500 ; over12 500 + 495 = 995
+          expect(result.total).toBe(1995);
+        });
+      });
 
 describe("pricing — additional artist", () => {
   it("adds R850 only when explicitly requested", () => {
@@ -87,14 +87,12 @@ describe("pricing — large parties are not double counted", () => {
   });
 });
 
-describe("pricing — lessons & events", () => {
-  it("applies the 10+ group-lesson rate", () => {
-    const nine = estimate(
-      input({ occasion: "matric", lesson: { attendees: 9 } }),
-    );
+describe("pricing — matric & events", () => {
+  it("charges matric at a flat R750 per face", () => {
+    const nine = estimate(input({ occasion: "matric", lesson: { attendees: 9 } }));
     const ten = estimate(input({ occasion: "matric", lesson: { attendees: 10 } }));
-    expect(nine.total).toBe(9 * 700);
-    expect(ten.total).toBe(10 * 600);
+    expect(nine.total).toBe(9 * 750);
+    expect(ten.total).toBe(10 * 750);
   });
 
   it("only charges travel for an event when meeting at the venue", () => {
@@ -123,8 +121,8 @@ describe("pricing — state line", () => {
     const wedding = input();
     expect(estimateStateLine(wedding, estimate(wedding))).toContain("incl. trial & touch-ups");
 
-    const lesson = input({ occasion: "matric", lesson: { attendees: 12 } });
-    expect(estimateStateLine(lesson, estimate(lesson))).toBe("12 attending · group lesson");
+    const matric = input({ occasion: "matric", lesson: { attendees: 12 } });
+        expect(estimateStateLine(matric, estimate(matric))).toBe("12 faces · matric farewell");
   });
 
   it("reports a destination instead of a number", () => {

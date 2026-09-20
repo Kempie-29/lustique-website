@@ -1,6 +1,6 @@
 /**
  * Every price in the estimator is sourced from here — nothing is hard-coded in
- * markup. Figures follow the Lustique Co. pricing schedule.
+ * markup. Figures follow the live Lustique Co. pricing schedule.
  */
 
 export type HairLength = "short" | "medium" | "long" | "xlong";
@@ -32,8 +32,9 @@ export const PRICES = {
     makeup: {
       bridesmaid: 550,
       mother: 500,
-      guest: 500,
-      flowerGirlOver12: 550,
+      /** Guests share the bridesmaid rate. */
+      guest: 550,
+      flowerGirlOver12: 500,
       flowerGirlUnder12: 250,
     } as const,
     hair: { short: 395, medium: 495, long: 595, xlong: 695 } as HairLengthPrices,
@@ -51,10 +52,22 @@ export const PRICES = {
     hair: { short: 395, medium: 495, long: 595, xlong: 695 } as HairLengthPrices,
   },
 
-  /** Matric / group lessons — per attending face, tiered by group size. */
+  /**
+   * Beyond-bridal flat rates — charged per face/look, whatever the services.
+   * Matric reuses the per-face model of the live estimator.
+   */
+  beyondBridal: {
+    matric: 750,
+    editorial: 750,
+    engagement: 650,
+    pageant: 950,
+  },
+
+  /** Group lessons — per attending face, tiered by group size (minimum 6). */
   lesson: {
     under10: 700,
     tenPlus: 600,
+    minAttendees: 6,
   },
 
   /** Optional additional artist, only ever added when the user asks for one. */
@@ -64,6 +77,9 @@ export const PRICES = {
     freeRoundTripKm: 40,
     perKm: 7,
     destinationOneWayKm: 200,
+    /** Destination accommodation estimate: per artist, per night. */
+    accommodationPerArtistNight: 1000,
+    accommodationNights: 2,
   },
 } as const;
 
@@ -93,13 +109,17 @@ export const REFERRAL_OPTIONS = [
   "Other",
 ] as const;
 
+/**
+ * Manual distance bands used when an address cannot be geocoded. Each closed
+ * band carries the confirmed fallback fee from the live estimator; the 200+
+ * band is a destination and carries no automatic price.
+ */
 export const DISTANCE_BANDS = [
-  { value: "0-20", label: "Within 20 km (one way)" },
-  { value: "20-40", label: "20–40 km (one way)" },
-  { value: "40-60", label: "40–60 km (one way)" },
-  { value: "60-100", label: "60–100 km (one way)" },
-  { value: "100-200", label: "100–200 km (one way)" },
-  { value: "200+", label: "More than 200 km (one way)" },
+  { value: "0-20", label: "Within 20 km (one way)", fee: 0 },
+  { value: "20-80", label: "20–80 km (one way)", fee: 770 },
+  { value: "80-150", label: "80–150 km (one way)", fee: 1610 },
+  { value: "150-200", label: "150–200 km (one way)", fee: 2450 },
+  { value: "200+", label: "More than 200 km (one way)", fee: null },
 ] as const;
 
 export type DistanceBand = (typeof DISTANCE_BANDS)[number]["value"];

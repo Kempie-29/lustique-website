@@ -6,7 +6,7 @@
  * Origin: Lustique Co. studio, La Montagne, Pretoria.
  */
 
-import { PRICES, type DistanceBand } from "@/content/pricing";
+import { DISTANCE_BANDS, PRICES, type DistanceBand } from "@/content/pricing";
 import { site } from "@/content/site";
 
 export type TravelStatus = "ok" | "unknown" | "destination";
@@ -78,21 +78,43 @@ export function travelFromLatLng(lat: number, lng: number): TravelEstimate {
 }
 
 /**
- * Manual fallback when an address cannot be resolved. Only the "200+" band is
- * decisive (destination); every other band stays unconfirmed so we never show a
- * guessed fee.
+ * Manual fallback when an address cannot be resolved. Each closed band carries
+ * the confirmed fallback fee from the live estimator; the 200+ band is a
+ * destination and is never priced automatically.
  */
 export function travelFromBand(band: DistanceBand | null): TravelEstimate {
-  if (band === "200+") {
-    return {
-      status: "destination",
-      oneWayKm: null,
-      roundTripKm: null,
-      fee: null,
-      confirmed: false,
-    };
-  }
-  return unknownTravel();
+  if (!band) return unknownTravel();
+  const entry = DISTANCE_BANDS.find((b) => b.value === band);
+  if (!entry) return unknownTravel();
+
+  if (entry.fee === null) return destinationTravel();
+
+  return {
+    status: "ok",
+    oneWayKm: null,
+    roundTripKm: null,
+    fee: entry.fee,
+    confirmed: true,
+  };
+}
+
+function destinationTravel(): TravelEstimate {
+  return {
+    status: "destination",
+    oneWayKm: null,
+    roundTripKm: null,
+    fee: null,
+    confirmed: false,
+  };
+}
+
+/**
+ * Destination accommodation estimate: a nightly rate per artist, for the
+ * number of nights a remote wedding keeps the team away from home.
+ */
+export function accommodationEstimate(artists: number): number {
+  const n = Math.max(0, Math.round(artists));
+  return n * TRAVEL_RULES.accommodationPerArtistNight * TRAVEL_RULES.accommodationNights;
 }
 
 export function getMapsApiKey(): string | undefined {

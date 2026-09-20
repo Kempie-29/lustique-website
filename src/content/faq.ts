@@ -45,14 +45,14 @@ export const faqs: FaqEntry[] = [
     id: "promo",
     question: "How does the current offer work?",
     answer:
-      "Book hair and makeup for four or more full looks and the least-expensive eligible look is on us. The bride, under-12 flower girls and trials are never the look that is freed. Full terms are on our offer terms page.",
-  },
-  {
-    id: "events",
-    question: "Do you do matric farewells and events?",
-    answer:
-      "Yes. We offer event makeup and hair at the venue or in our studio, and group lessons for matric farewells priced per person by group size.",
-  },
+          "Book hair and makeup for four or more full looks and the least-expensive eligible look is on us. The bride, under-12 flower girls and trials are never the look that is freed. Minimum bookings and any conditions are confirmed with your estimate.",
+      },
+      {
+        id: "events",
+        question: "Do you do matric farewells and events?",
+        answer:
+          "Yes. Matric farewells are a flat rate per face, and we offer event makeup and hair at the venue or in our studio. We also run group lessons for smaller groups.",
+      },
   {
     id: "bring",
     question: "What should I bring to my appointment?",

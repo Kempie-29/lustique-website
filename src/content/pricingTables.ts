@@ -74,25 +74,40 @@ export const pricingTables: PriceTable[] = [
     ],
   },
   {
-    id: "events",
-    title: "Events & occasions",
-    intro: "Matric farewells, birthdays and events — at the venue or in the studio.",
-    rows: [
-      { label: "Event makeup", price: formatZar(PRICES.event.makeup) },
-      ...HAIR_LENGTHS.map((l) => ({
-        label: `Event hair — ${l.label}`,
-        price: formatZar(PRICES.event.hair[l.value]),
-      })),
-      {
-        label: "Group lesson — under 10 attending",
-        price: `${formatZar(PRICES.lesson.under10)} each`,
-      },
-      {
-        label: "Group lesson — 10 or more attending",
-        price: `${formatZar(PRICES.lesson.tenPlus)} each`,
-      },
-    ],
-  },
+      id: "events",
+      title: "Events & occasions",
+      intro: "Matric farewells, birthdays and events — at the venue or in the studio.",
+      rows: [
+        { label: "Event makeup", price: formatZar(PRICES.event.makeup) },
+        ...HAIR_LENGTHS.map((l) => ({
+          label: `Event hair — ${l.label}`,
+          price: formatZar(PRICES.event.hair[l.value]),
+        })),
+        {
+          label: "Matric farewell — hair & makeup",
+          price: `${formatZar(PRICES.beyondBridal.matric)} per face`,
+        },
+        {
+          label: "Group lesson — under 10 attending",
+          price: `${formatZar(PRICES.lesson.under10)} each`,
+          note: `minimum ${PRICES.lesson.minAttendees} attending`,
+        },
+        {
+          label: "Group lesson — 10 or more attending",
+          price: `${formatZar(PRICES.lesson.tenPlus)} each`,
+        },
+      ],
+    },
+    {
+      id: "beyond-bridal",
+      title: "Beyond bridal",
+      intro: "Editorial, engagement, corporate and pageant work — flat rate per look.",
+      rows: [
+        { label: "Editorial & shoot", price: formatZar(PRICES.beyondBridal.editorial) },
+        { label: "Engagement & corporate", price: formatZar(PRICES.beyondBridal.engagement) },
+        { label: "Pageant", price: formatZar(PRICES.beyondBridal.pageant) },
+      ],
+    },
   {
     id: "travel",
     title: "Travel & extras",

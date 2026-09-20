@@ -209,18 +209,19 @@ export function estimate(input: EstimateInput): EstimateResult {
   let heads = 0;
 
   if (input.occasion === "matric") {
-    const attendees = Math.max(0, input.lesson.attendees);
-    if (attendees > 0) {
-      const rate = attendees >= 10 ? PRICES.lesson.tenPlus : PRICES.lesson.under10;
-      lines.push({
-        id: "lesson",
-        label: `Group lesson × ${attendees} ${pluralise(attendees, "attending", "attending")}`,
-        amount: attendees * rate,
-        group: "lesson",
-      });
-      heads += attendees;
-    }
-  } else if (input.occasion === "event") {
+      // Matric is a beyond-bridal flat rate charged per face, reusing the
+      // event-style attendee count.
+      const faces = Math.max(0, input.lesson.attendees);
+      if (faces > 0) {
+        lines.push({
+          id: "matric",
+          label: `Matric look × ${faces}`,
+          amount: faces * PRICES.beyondBridal.matric,
+          group: "lesson",
+        });
+        heads += faces;
+      }
+    } else if (input.occasion === "event") {
     const { event } = input;
     if (event.makeup > 0) {
       lines.push({
@@ -411,9 +412,9 @@ export function estimateStateLine(input: EstimateInput, result: EstimateResult):
   if (result.isDestination) return "Destination — we'll tailor it";
 
   if (input.occasion === "matric") {
-    const n = Math.max(0, input.lesson.attendees);
-    return `${n} attending · group lesson`;
-  }
+      const n = Math.max(0, input.lesson.attendees);
+      return `${n} ${pluralise(n, "face")} · matric farewell`;
+    }
   if (input.occasion === "event") {
     return `${result.heads} ${pluralise(result.heads, "face")} · approximate event estimate`;
   }
