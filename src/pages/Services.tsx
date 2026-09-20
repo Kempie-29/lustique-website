@@ -1,30 +1,11 @@
 import { PageHero } from "@/components/shell/PageHero";
 import { Seo } from "@/components/Seo";
-import { JsonLd, breadcrumbSchema } from "@/components/JsonLd";
+import { JsonLd, breadcrumbSchema, serviceListSchema } from "@/components/JsonLd";
 import { Reveal } from "@/components/shell/Reveal";
 import { Button } from "@/components/primitives/Button";
 import { Card } from "@/components/primitives/Card";
 import { Monogram } from "@/components/shell/Monogram";
 import { services } from "@/content/services";
-import { site } from "@/content/site";
-
-function servicesSchema() {
-  return {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    itemListElement: services.map((service, i) => ({
-      "@type": "ListItem",
-      position: i + 1,
-      item: {
-        "@type": "Service",
-        name: service.name,
-        description: service.summary,
-        provider: { "@type": "BeautySalon", name: site.name, url: site.url },
-        areaServed: site.areasServed,
-      },
-    })),
-  };
-}
 
 export default function Services() {
   return (
@@ -34,7 +15,7 @@ export default function Services() {
         description="Bridal makeup, bridal hair, the whole party and events — with transparent, tiered pricing from Lustique Co. in Pretoria."
         path="/services"
       />
-      <JsonLd data={[breadcrumbSchema([{ label: "Services", to: "/services" }]), servicesSchema()]} />
+      <JsonLd data={[breadcrumbSchema([{ label: "Services", to: "/services" }]), serviceListSchema()]} />
 
       <PageHero
         eyebrow="What we do"

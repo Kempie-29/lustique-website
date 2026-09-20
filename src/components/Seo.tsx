@@ -1,12 +1,16 @@
 import { useEffect } from "react";
 import { site } from "@/content/site";
+import { findPublicRoute, isPrivatePath, ogImage } from "@/routes";
 
 interface SeoProps {
-  title: string;
-  description: string;
+  /** Optional override — otherwise the route manifest supplies the title. */
+  title?: string;
+  /** Optional override — otherwise the route manifest supplies the description. */
+  description?: string;
   path: string;
   /** Thank-you and other transient pages set this to true. */
   noindex?: boolean;
+  /** Path to a specific share image, e.g. a gallery photo. */
   image?: string;
 }
 
@@ -30,29 +34,44 @@ function upsertLink(rel: string, href: string) {
   el.setAttribute("href", href);
 }
 
-/** Per-route document head. Runtime-managed in Phase 1 (no prerender yet). */
-export function Seo({ title, description, path, noindex = false, image }: SeoProps) {
+function absolute(path: string) {
+  return path.startsWith("http") ? path : `${site.url}${path}`;
+}
+
+/**
+ * Per-route document head. Manifest-driven: titles, descriptions and the
+ * default share image come from `src/routes.json`, and private routes are
+ * automatically marked noindex. The static prerender pass (Phase 5) bakes the
+ * same values into HTML so crawlers never depend on runtime JS.
+ */
+export function Seo({ title, description, path, noindex, image }: SeoProps) {
   useEffect(() => {
-    const fullTitle = title.includes(site.name) ? title : `${title} — ${site.name}`;
+    const route = findPublicRoute(path);
+    const resolvedTitle = title ?? route?.title ?? site.name;
+    const resolvedDescription = description ?? route?.description ?? site.shortDescription;
+    const fullTitle = resolvedTitle.includes(site.name) ? resolvedTitle : `${resolvedTitle} — ${site.name}`;
     const url = `${site.url}${path}`;
-    const ogImage = image ? `${site.url}${image}` : `${site.url}/assets/logo.svg`;
+    const shareImage = absolute(image ?? ogImage);
+    const isPrivate = noindex ?? isPrivatePath(path);
 
     document.title = fullTitle;
-    upsertMeta("name", "description", description);
-    upsertMeta("name", "robots", noindex ? "noindex, nofollow" : "index, follow");
+    upsertMeta("name", "description", resolvedDescription);
+    upsertMeta("name", "robots", isPrivate ? "noindex, nofollow" : "index, follow");
     upsertLink("canonical", url);
 
     upsertMeta("property", "og:type", "website");
     upsertMeta("property", "og:site_name", site.name);
+    upsertMeta("property", "og:locale", "en_ZA");
     upsertMeta("property", "og:title", fullTitle);
-    upsertMeta("property", "og:description", description);
+    upsertMeta("property", "og:description", resolvedDescription);
     upsertMeta("property", "og:url", url);
-    upsertMeta("property", "og:image", ogImage);
+    upsertMeta("property", "og:image", shareImage);
+    upsertMeta("property", "og:image:alt", `${site.name} — ${site.tagline}`);
 
     upsertMeta("name", "twitter:card", "summary_large_image");
     upsertMeta("name", "twitter:title", fullTitle);
-    upsertMeta("name", "twitter:description", description);
-    upsertMeta("name", "twitter:image", ogImage);
+    upsertMeta("name", "twitter:description", resolvedDescription);
+    upsertMeta("name", "twitter:image", shareImage);
   }, [title, description, path, noindex, image]);
 
   return null;

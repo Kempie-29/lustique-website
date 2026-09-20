@@ -1,11 +1,10 @@
 import { Link, useParams } from "react-router-dom";
 import { PageHero } from "@/components/shell/PageHero";
 import { Seo } from "@/components/Seo";
-import { JsonLd, breadcrumbSchema } from "@/components/JsonLd";
+import { JsonLd, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
 import { Article } from "@/components/content/Article";
 import { Button } from "@/components/primitives/Button";
 import { guides } from "@/content/guides";
-import { site } from "@/content/site";
 import { Placeholder } from "@/pages/Placeholder";
 
 export default function GuideDetail() {
@@ -33,19 +32,15 @@ export default function GuideDetail() {
       <JsonLd
         data={[
           breadcrumbSchema([
-            { label: "Guides", to: "/guides" },
-            { label: guide.title, to: `/guides/${guide.slug}` },
-          ]),
-          {
-            "@context": "https://schema.org",
-            "@type": "Article",
-            headline: guide.title,
-            description: guide.excerpt,
-            author: { "@type": "Organization", name: site.name, url: site.url },
-            publisher: { "@type": "Organization", name: site.name, url: site.url },
-            mainEntityOfPage: `${site.url}/guides/${guide.slug}`,
-          },
-        ]}
+                      { label: "Guides", to: "/guides" },
+                      { label: guide.title, to: `/guides/${guide.slug}` },
+                    ]),
+                    articleSchema({
+                      title: guide.title,
+                      description: guide.excerpt,
+                      path: `/guides/${guide.slug}`,
+                    }),
+                  ]}
       />
 
       <PageHero

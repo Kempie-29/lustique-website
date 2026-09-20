@@ -9,6 +9,8 @@ import { formatZar } from "@/lib/format";
 export interface ServiceDetail {
   id: string;
   name: string;
+  /** Numeric "from" price in ZAR — the single source for the label and schema. */
+  fromPrice: number;
   fromLabel: string;
   summary: string;
   includes: string[];
@@ -19,6 +21,7 @@ export const services: ServiceDetail[] = [
   {
     id: "bridal-makeup",
     name: "Bridal makeup",
+    fromPrice: PRICES.bride.makeupDay,
     fromLabel: `from ${formatZar(PRICES.bride.makeupDay)}`,
     summary:
       "A considered, long-wearing bridal look, designed with you at your trial and finished with a touch-up kit for the ceremony.",
@@ -32,8 +35,9 @@ export const services: ServiceDetail[] = [
   },
   {
     id: "bridal-hair",
-    name: "Bridal hair",
-    fromLabel: `from ${formatZar(PRICES.bride.hair.short)}`,
+        name: "Bridal hair",
+        fromPrice: PRICES.bride.hair.short,
+        fromLabel: `from ${formatZar(PRICES.bride.hair.short)}`,
     summary:
       "Soft, structured styling that holds from your first look to your last dance — priced by length so there are no surprises.",
     includes: [
@@ -46,8 +50,9 @@ export const services: ServiceDetail[] = [
   },
   {
     id: "the-party",
-    name: "The whole party",
-    fromLabel: `bridesmaid makeup ${formatZar(PRICES.party.makeup.bridesmaid)}`,
+        name: "The whole party",
+        fromPrice: PRICES.party.makeup.bridesmaid,
+        fromLabel: `bridesmaid makeup ${formatZar(PRICES.party.makeup.bridesmaid)}`,
     summary:
       "Bridesmaids, mothers, flower girls and guests — looked after in turn, with a running order that keeps the morning calm.",
     includes: [
@@ -60,8 +65,9 @@ export const services: ServiceDetail[] = [
   },
   {
     id: "events-from-me",
-    name: "Events & occasions",
-    fromLabel: `from ${formatZar(PRICES.event.makeup)}`,
+        name: "Events & occasions",
+        fromPrice: PRICES.event.makeup,
+        fromLabel: `from ${formatZar(PRICES.event.makeup)}`,
     summary:
       "Beyond weddings: matric farewells, milestone birthdays and events, at the venue or in our studio.",
     includes: [

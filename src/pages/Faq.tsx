@@ -1,23 +1,11 @@
 import { PageHero } from "@/components/shell/PageHero";
 import { Seo } from "@/components/Seo";
-import { JsonLd, breadcrumbSchema } from "@/components/JsonLd";
+import { JsonLd, breadcrumbSchema, faqPageSchema } from "@/components/JsonLd";
 import { Reveal } from "@/components/shell/Reveal";
 import { Accordion } from "@/components/primitives/Accordion";
 import { Button } from "@/components/primitives/Button";
 import { faqs } from "@/content/faq";
 import { site, whatsappLink } from "@/content/site";
-
-function faqSchema() {
-  return {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((f) => ({
-      "@type": "Question",
-      name: f.question,
-      acceptedAnswer: { "@type": "Answer", text: f.answer },
-    })),
-  };
-}
 
 export default function Faq() {
   return (
@@ -27,7 +15,7 @@ export default function Faq() {
         description="The things brides most often ask Lustique Co. about trials, travel, pricing and timing."
         path="/faq"
       />
-      <JsonLd data={[breadcrumbSchema([{ label: "FAQ", to: "/faq" }]), faqSchema()]} />
+      <JsonLd data={[breadcrumbSchema([{ label: "FAQ", to: "/faq" }]), faqPageSchema()]} />
 
       <PageHero
         eyebrow="FAQ"

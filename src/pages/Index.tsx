@@ -1,5 +1,5 @@
 import { Seo } from "@/components/Seo";
-import { JsonLd, beautySalonSchema } from "@/components/JsonLd";
+import { JsonLd, beautySalonSchema, websiteSchema } from "@/components/JsonLd";
 import { Monogram } from "@/components/shell/Monogram";
 import { BlurUpImage } from "@/components/shell/BlurUpImage";
 import { Reveal } from "@/components/shell/Reveal";
@@ -57,7 +57,7 @@ export default function Index() {
         description={site.shortDescription}
         path="/"
       />
-      <JsonLd data={beautySalonSchema()} />
+      <JsonLd data={[beautySalonSchema(), websiteSchema()]} />
 
       {/* 1 · Hero */}
       <section className={`hero ${hasHeroPhoto ? "" : "hero--monogram"}`}>

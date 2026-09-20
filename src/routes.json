@@ -1,0 +1,120 @@
+{
+  "ogImage": "/assets/og-image.svg",
+  "public": [
+    {
+      "path": "/",
+      "title": "Lustique Co. — Bridal hair & makeup artistry in Pretoria",
+      "description": "Bridal hair & makeup artistry for brides across Pretoria and beyond — quiet, personal, and unhurried.",
+      "priority": 1.0,
+      "changeFrequency": "weekly"
+    },
+    {
+      "path": "/quote",
+      "title": "Get a Quote",
+      "description": "Build a live estimate for your wedding hair and makeup, and send your enquiry.",
+      "priority": 0.9,
+      "changeFrequency": "weekly"
+    },
+    {
+      "path": "/services",
+      "title": "Services",
+      "description": "Bridal makeup, bridal hair, the whole party and events — with transparent, tiered pricing from Lustique Co. in Pretoria.",
+      "priority": 0.8,
+      "changeFrequency": "monthly"
+    },
+    {
+      "path": "/pricing",
+      "title": "Pricing",
+      "description": "Full, transparent pricing for bridal hair and makeup, the bridal party, events and travel at Lustique Co., Pretoria.",
+      "priority": 0.8,
+      "changeFrequency": "monthly"
+    },
+    {
+      "path": "/portfolio",
+      "title": "Portfolio",
+      "description": "Photography from Lustique Co. weddings, parties and editorials.",
+      "priority": 0.7,
+      "changeFrequency": "monthly"
+    },
+    {
+      "path": "/team",
+      "title": "The Team",
+      "description": "Meet the Lustique Co. artists — bridal hair and makeup artistry in La Montagne, Pretoria.",
+      "priority": 0.7,
+      "changeFrequency": "monthly"
+    },
+    {
+      "path": "/about",
+      "title": "About",
+      "description": "The story of Lustique Co. — a bridal hair and makeup studio in La Montagne, Pretoria.",
+      "priority": 0.6,
+      "changeFrequency": "monthly"
+    },
+    {
+      "path": "/guides",
+      "title": "Guides",
+      "description": "Free, practical guides on skin, hair and timing from the Lustique Co. bridal studio in Pretoria.",
+      "priority": 0.6,
+      "changeFrequency": "monthly"
+    },
+    {
+      "path": "/journal",
+      "title": "Journal",
+      "description": "Notes from the Lustique Co. studio — quiet mornings, why we trial, and the people we work alongside.",
+      "priority": 0.6,
+      "changeFrequency": "monthly"
+    },
+    {
+      "path": "/faq",
+      "title": "FAQ",
+      "description": "The things brides most often ask Lustique Co. about trials, travel, pricing and timing.",
+      "priority": 0.6,
+      "changeFrequency": "monthly"
+    },
+    {
+      "path": "/contact",
+      "title": "Contact",
+      "description": "Contact Lustique Co. in La Montagne, Pretoria — email, phone and WhatsApp.",
+      "priority": 0.6,
+      "changeFrequency": "monthly"
+    },
+    {
+      "path": "/vendors",
+      "title": "For vendors",
+      "description": "How Lustique Co. works alongside planners, photographers, venues and florists in Gauteng.",
+      "priority": 0.4,
+      "changeFrequency": "yearly"
+    },
+    {
+      "path": "/terms",
+      "title": "Terms of service",
+      "description": "The plain-language terms that govern bookings with Lustique Co.",
+      "priority": 0.3,
+      "changeFrequency": "yearly"
+    },
+    {
+      "path": "/privacy",
+      "title": "Privacy notice",
+      "description": "How Lustique Co. collects, uses and protects your information under POPIA.",
+      "priority": 0.3,
+      "changeFrequency": "yearly"
+    }
+  ],
+  "private": ["/portal", "/dashboard", "/signin", "/auth", "/checkout", "/thank-you"],
+  "dynamic": [
+    {
+      "prefix": "/guides/",
+      "source": "src/content/guides.ts",
+      "title": "Guide",
+      "priority": 0.5,
+      "changeFrequency": "yearly"
+    },
+    {
+      "prefix": "/journal/",
+      "source": "src/content/journal.ts",
+      "title": "Journal",
+      "priority": 0.5,
+      "changeFrequency": "yearly"
+    }
+  ]
+}

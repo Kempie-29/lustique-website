@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { PageHero } from "@/components/shell/PageHero";
 import { Seo } from "@/components/Seo";
-import { JsonLd, breadcrumbSchema } from "@/components/JsonLd";
+import { JsonLd, breadcrumbSchema, gallerySchema } from "@/components/JsonLd";
 import { Reveal } from "@/components/shell/Reveal";
 import { Button } from "@/components/primitives/Button";
 import { Monogram } from "@/components/shell/Monogram";
@@ -38,7 +38,9 @@ export default function Portfolio() {
         description="Photography from Lustique Co. weddings, parties and editorials."
         path="/portfolio"
       />
-      <JsonLd data={breadcrumbSchema([{ label: "Portfolio", to: "/portfolio" }])} />
+      <JsonLd
+              data={[breadcrumbSchema([{ label: "Portfolio", to: "/portfolio" }]), ...gallerySchema()]}
+            />
 
       <PageHero
         eyebrow="Portfolio"

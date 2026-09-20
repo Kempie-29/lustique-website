@@ -103,6 +103,11 @@
   gap: var(--space-md);
   min-height: var(--header-h);
 }
+/* ————— Logo ————— */
+.logo { display: block; height: auto; max-width: 100%; }
+.logo--emblem { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; }
+.logo--full { width: auto; height: 64px; object-fit: contain; }
+
 .brand {
   display: inline-flex;
   align-items: center;
@@ -623,7 +628,7 @@
 .back-to-top {
   position: fixed;
   z-index: 125;
-  right: var(--gutter);
+  left: var(--gutter);
   bottom: var(--gutter);
   width: 46px;
   height: 46px;
@@ -1270,11 +1275,11 @@ html.js .ph.img-error img { opacity: 1; filter: none; }
 /* ————— WhatsApp float ————— */
 .btn-whatsapp-float {
   position: fixed;
-  left: var(--gutter);
+  right: var(--gutter);
   bottom: var(--gutter);
   z-index: 124;
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   background: #25d366;
   color: #fff;
@@ -1283,9 +1288,12 @@ html.js .ph.img-error img { opacity: 1; filter: none; }
   box-shadow: var(--shadow-md);
   transition: transform var(--dur) var(--ease);
 }
+.btn-whatsapp-float svg { display: block; }
 .btn-whatsapp-float:hover { transform: translateY(-2px); }
 @media (max-width: 760px) {
+  /* Lift both floats clear of the mobile sticky total bar. */
   .btn-whatsapp-float { bottom: calc(var(--gutter) + 56px); }
+  .back-to-top { bottom: calc(var(--gutter) + 56px); }
 }
 
 /* ————— Mobile sticky total ————— */

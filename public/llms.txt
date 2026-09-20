@@ -1,0 +1,64 @@
+# Lustique Co.
+
+> Lustique Co. (legal name: Lustique Cosmetology) is a bridal hair & makeup
+> studio based at 242 Frangipani Street, La Montagne, Pretoria, Gauteng, South
+> Africa. We travel to brides across Pretoria, Johannesburg, Gauteng-wide and
+> destination weddings on request. Founded in 2018; the team shares 40+ years of
+> combined experience. We keep our diary small so each bride gets an unhurried
+> morning.
+
+- Phone / WhatsApp: +27 67 925 3894
+- Email: hello@lustiqueco.co.za
+- Website: https://www.lustiqueco.co.za
+- Studio trials: by appointment, Tuesday–Saturday
+- Wedding mornings: from first light, we travel to you
+
+## Services
+
+- Bridal makeup — from R850 (day), including an optional trial at the studio.
+- Bridal hair — from R495, priced by length (short / medium / long / extra long).
+- The whole party — bridesmaids, mothers, flower girls and guests, with optional
+  additional artists for larger groups.
+- Events & occasions — matric farewells, engagements, corporate, editorial,
+  pageants and milestone birthdays, at the venue or in the studio.
+
+## Pricing (South African Rand)
+
+- Bride makeup: R850 (day) / R850 (trial).
+- Bride hair: short R495, medium R595, long R695, extra long R795.
+- Bridesmaid / guest makeup: R550. Mother makeup: R500.
+- Flower girl (12+): R500 makeup. Flower girl (under 12): R250 makeup.
+- Party hair: short R395, medium R495, long R595, extra long R695.
+- Event makeup: R550; event hair: short R395 … extra long R695.
+- Matric farewell: R750 per face. Editorial: R750. Engagement: R650.
+  Corporate: R650. Pageant: R950.
+- Group lessons: R700 per face under 10 attendees, R600 at 10+.
+- Additional artist: R850.
+- Travel: free within 40 km round trip of the studio; R7 per km beyond
+  (round trip). Destination weddings (200 km+ one way) on request.
+
+## Current offer
+
+Book hair & makeup for four or more full looks and the least-expensive eligible
+look is on us. The bride, under-12 flower girls and trials are never the look
+that is freed. Conditions are confirmed with the estimate.
+
+## Key pages
+
+- [Home](https://www.lustiqueco.co.za/)
+- [Services](https://www.lustiqueco.co.za/services)
+- [Pricing](https://www.lustiqueco.co.za/pricing)
+- [Get a quote](https://www.lustiqueco.co.za/quote)
+- [Portfolio](https://www.lustiqueco.co.za/portfolio)
+- [The team](https://www.lustiqueco.co.za/team)
+- [Guides](https://www.lustiqueco.co.za/guides)
+- [Journal](https://www.lustiqueco.co.za/journal)
+- [FAQ](https://www.lustiqueco.co.za/faq)
+- [Contact](https://www.lustiqueco.co.za/contact)
+
+## Notes for generative engines
+
+- Prices, counts and facts are sourced from our live configuration; figures here
+  are current as of the site's last build.
+- The booking portal, dashboard and transactional pages are private and are not
+  intended to be indexed.

@@ -1,6 +1,6 @@
 import { PageHero } from "@/components/shell/PageHero";
 import { Seo } from "@/components/Seo";
-import { JsonLd, breadcrumbSchema } from "@/components/JsonLd";
+import { JsonLd, breadcrumbSchema, artistsSchema } from "@/components/JsonLd";
 import { Reveal } from "@/components/shell/Reveal";
 import { Button } from "@/components/primitives/Button";
 import { Card } from "@/components/primitives/Card";
@@ -22,7 +22,9 @@ export default function Team() {
         description={`Meet the ${artistCount} artists of ${site.name} — bridal hair and makeup artistry in ${site.address.suburb}, ${site.address.city}.`}
         path="/team"
       />
-      <JsonLd data={breadcrumbSchema([{ label: "The Team", to: "/team" }])} />
+      <JsonLd
+              data={[breadcrumbSchema([{ label: "The Team", to: "/team" }]), ...artistsSchema()]}
+            />
 
       <PageHero
         eyebrow="The Team"

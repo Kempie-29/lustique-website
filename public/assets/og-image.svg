@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Lustique Co. — bridal hair and makeup artistry in Pretoria">
+  <rect width="1200" height="630" fill="#FBF8F3" />
+  <rect x="24" y="24" width="1152" height="582" fill="none" stroke="#C08A86" stroke-opacity="0.55" stroke-width="2" />
+  <g transform="translate(600 250)">
+    <circle r="74" fill="#9E5F58" />
+    <circle r="66" fill="none" stroke="#E4D2B8" stroke-opacity="0.6" stroke-width="1.5" />
+    <text y="20" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-size="70" font-style="italic" fill="#FBF8F3">LC</text>
+  </g>
+  <text x="600" y="392" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-size="64" letter-spacing="6" fill="#3A2E26">LUSTIQUE CO.</text>
+  <text x="600" y="452" text-anchor="middle" font-family="Manrope, Helvetica, Arial, sans-serif" font-size="26" letter-spacing="3" fill="#9E5F58">BRIDAL HAIR &amp; MAKEUP ARTISTRY · PRETORIA</text>
+  <text x="600" y="510" text-anchor="middle" font-family="Manrope, Helvetica, Arial, sans-serif" font-size="20" letter-spacing="2" fill="#8A7D74">lustiqueco.co.za</text>
+</svg>
