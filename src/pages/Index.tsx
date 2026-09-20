@@ -1,6 +1,7 @@
 import { Seo } from "@/components/Seo";
 import { JsonLd, beautySalonSchema } from "@/components/JsonLd";
 import { Monogram } from "@/components/shell/Monogram";
+import { BlurUpImage } from "@/components/shell/BlurUpImage";
 import { Reveal } from "@/components/shell/Reveal";
 import { Testimonials } from "@/components/home/Testimonials";
 import { Button } from "@/components/primitives/Button";
@@ -62,7 +63,12 @@ export default function Index() {
       <section className={`hero ${hasHeroPhoto ? "" : "hero--monogram"}`}>
         <div className="hero__media">
           {hasHeroPhoto ? (
-            <img src={gallery[0].imageUrl} alt={gallery[0].alt} fetchPriority="high" />
+            <BlurUpImage
+              src={gallery[0].imageUrl}
+              alt={gallery[0].alt}
+              loading="eager"
+              fetchPriority="high"
+            />
           ) : (
             <Monogram mark="LC" />
           )}

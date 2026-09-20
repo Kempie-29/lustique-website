@@ -21,17 +21,34 @@ export const NAV_ITEMS: NavItem[] = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
     setOpen(false);
   }, [location.pathname]);
 
+  // Sticky-nav shadow once the page has scrolled past 20px (live behaviour).
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Lock body scroll while the mobile menu is open.
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
   const isActive = (to: string) =>
     location.pathname === to || location.pathname.startsWith(`${to}/`);
 
   return (
-    <header className="site-header">
+    <header id="nav" className={`site-header ${scrolled ? "scrolled" : ""}`.trim()}>
       <div className="wrap header-inner">
         <Brand />
 
@@ -77,7 +94,7 @@ export function Header() {
         </button>
       </div>
 
-      <div id="mobile-nav" className={`mobile-nav ${open ? "is-open" : ""}`}>
+      <div id="mobile-nav" className={`mobile-nav ${open ? "is-open open" : ""}`.trim()}>
         <ul>
           {NAV_ITEMS.map((item) => (
             <li key={item.to}>

@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/primitives/Button";
-import { clearConsent, readConsent, writeConsent } from "@/lib/consent";
+import { clearConsent, initAnalytics, readConsent, writeConsent } from "@/lib/consent";
 
 /** POPIA cookie banner. Analytics only ever load after an explicit accept. */
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    setVisible(readConsent() === null);
+    // If consent was already given, load analytics (no banner).
+    if (readConsent() === "accepted") initAnalytics();
+    else setVisible(readConsent() === null);
 
+    // The footer's "Manage cookies" link re-opens the banner.
     const onManage = () => {
       clearConsent();
       setVisible(true);
@@ -23,10 +26,11 @@ export function CookieConsent() {
   const decide = (value: "accepted" | "declined") => {
     writeConsent(value);
     setVisible(false);
+    if (value === "accepted") initAnalytics();
   };
 
   return (
-    <div className="cookie-banner" role="dialog" aria-label="Cookie preferences">
+    <div className="cookie-banner" id="cookieBanner" role="dialog" aria-label="Cookie preferences">
       <p>
         We use essential cookies to run this site, and — only with your consent —
         analytics to understand how brides find us. See our{" "}

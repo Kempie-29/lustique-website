@@ -125,6 +125,21 @@ export default function Quote() {
   const stateLine = estimateStateLine(estimateInput, result);
   const showOffer = activePromotion.meta != null && activePromotion.config.kind !== "none";
 
+  const progress = useMemo(() => {
+    const checks: boolean[] = [
+      form.firstName.trim().length > 0,
+      form.email.trim().length > 0,
+      form.mobile.trim().length > 0,
+      form.occasion === "wedding" ? form.weddingDate.length > 0 : true,
+      form.occasion === "lessons"
+        ? true
+        : form.venueName.trim().length > 0 || form.venueAddress.trim().length > 0,
+      form.consent,
+    ];
+    const done = checks.filter(Boolean).length;
+    return Math.round((done / checks.length) * 100);
+  }, [form]);
+
   const panelLines = [...result.lines, ...promoLines];
   const grouped = useMemo(() => {
     const map: { section: string; lines: EstimateLine[] }[] = [];
@@ -228,6 +243,17 @@ export default function Quote() {
               ) : null}
 
               <form onSubmit={onSubmit} noValidate>
+                <div
+                  className="form-progress"
+                  role="progressbar"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={progress}
+                  aria-label="How far through the form you are"
+                >
+                  <span style={{ width: `${progress}%` }} />
+                </div>
+
                 {/* 1 · Occasion */}
                 <div className="form-section">
                   <div className="form-section__head">
@@ -640,7 +666,7 @@ export default function Quote() {
                 </div>
 
                 {/* 9 · Consent + send */}
-                <div className="form-section">
+                <div className="form-section" id="send">
                   <div className="form-section__head">
                     <span className="form-section__num">8</span>
                     <h3>Consent &amp; send</h3>
@@ -777,6 +803,23 @@ export default function Quote() {
           </div>
         </div>
       </section>
+
+      {/* Mobile sticky total — mirrors the live .sticky-bottom-cta + .floating-total */}
+      <div className="sticky-bottom-cta">
+        <div className="floating-total">
+          <span className="floating-total__label">Estimated total</span>
+          <span className="floating-total__figure tabular">{formatTotal(total, isWeddingLike)}</span>
+        </div>
+        <Button
+          variant="light"
+          size="sm"
+          onClick={() =>
+            document.getElementById("send")?.scrollIntoView({ behavior: "smooth", block: "center" })
+          }
+        >
+          Review &amp; send
+        </Button>
+      </div>
     </>
   );
 }

@@ -99,6 +99,7 @@ export function Footer() {
             <Link to="/privacy">Privacy</Link>
             <button
               type="button"
+              id="manageCookies"
               className="nav-link"
               style={{ background: "none", border: 0, cursor: "pointer", padding: 0 }}
               onClick={manageCookies}

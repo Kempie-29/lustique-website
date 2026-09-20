@@ -7,6 +7,7 @@ import { GrainOverlay } from "@/components/shell/GrainOverlay";
 import { Header } from "@/components/shell/Header";
 import { SkipLink } from "@/components/shell/SkipLink";
 import { TopBar } from "@/components/shell/TopBar";
+import { WhatsAppFloat } from "@/components/shell/WhatsAppFloat";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -29,6 +30,7 @@ export function SiteLayout() {
       </main>
       <Footer />
       <CookieConsent />
+      <WhatsAppFloat />
       <BackToTop />
       <ScrollToTop />
     </>

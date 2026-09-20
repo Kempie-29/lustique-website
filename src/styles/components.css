@@ -1237,3 +1237,102 @@
   color: var(--ink-faint);
   margin: 0.55rem 0 0.35rem;
 }
+
+/* ————— Progressive (blur-up) images ————— */
+.ph { display: contents; }
+.ph img { transition: opacity 0.6s var(--ease), filter 0.6s var(--ease); }
+html.js .ph img { opacity: 0; filter: blur(14px); }
+html.js .ph.loaded img,
+html.js .ph.img-error img { opacity: 1; filter: none; }
+
+/* ————— Header states (behaviour) ————— */
+.site-header.scrolled { box-shadow: var(--shadow-md); }
+.mobile-nav.open { max-height: 70vh; }
+
+/* ————— FAQ accordion height transition ————— */
+.accordion__panel { transition: max-height var(--dur-slow) var(--ease); }
+
+/* ————— Form progress ————— */
+.form-progress {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+  overflow: hidden;
+  margin-bottom: var(--space-md);
+}
+.form-progress > span {
+  display: block;
+  height: 100%;
+  background: var(--rose-deep);
+  transition: width var(--dur-slow) var(--ease);
+}
+
+/* ————— WhatsApp float ————— */
+.btn-whatsapp-float {
+  position: fixed;
+  left: var(--gutter);
+  bottom: var(--gutter);
+  z-index: 124;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--dur) var(--ease);
+}
+.btn-whatsapp-float:hover { transform: translateY(-2px); }
+@media (max-width: 760px) {
+  .btn-whatsapp-float { bottom: calc(var(--gutter) + 56px); }
+}
+
+/* ————— Mobile sticky total ————— */
+.sticky-bottom-cta {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 122;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 0.7rem var(--gutter);
+  background: var(--ink);
+  color: var(--ivory);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
+}
+.floating-total { display: flex; flex-direction: column; line-height: 1.1; }
+.floating-total__label {
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--champagne);
+}
+.floating-total__figure {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 760px) {
+  .sticky-bottom-cta { display: flex; }
+}
+
+/* ————— Print ————— */
+@media print {
+  .sticky-bottom-cta,
+  .btn-whatsapp-float,
+  .back-to-top,
+  .cookie-banner,
+  .topbar { display: none !important; }
+}
+
+/* ————— Reduced motion ————— */
+@media (prefers-reduced-motion: reduce) {
+  .ph img { transition: none; }
+  html.js .ph img { opacity: 1; filter: none; }
+  .accordion__panel,
+  .form-progress > span { transition: none; }
+}

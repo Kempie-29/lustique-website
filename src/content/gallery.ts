@@ -8,6 +8,8 @@ export interface GalleryItem {
   id: string;
   title: string;
   category: "Bridal" | "Party" | "Editorial";
+  /** Artist id from `content/artists.ts` — the portfolio filters by artist only. */
+  artist?: string;
   imageUrl: string;
   alt: string;
   width?: number;
