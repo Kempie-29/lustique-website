@@ -48,13 +48,13 @@ export default function Team() {
           </div>
 
           <div className="grid grid--3">
-            {artists.map((artist) => (
-              <Reveal key={artist.id} variant="rise">
+            {artists.map((artist, i) => (
+              <Reveal key={artist.id} variant="rise" delay={(i % 3) * 90}>
                 <div style={{ height: "100%" }}>
                   <Card imageUrl={artist.photoUrl} alt={artist.name} mark={artist.name.charAt(0)}>
                     <h3 style={{ fontSize: "var(--step-2)" }}>{artist.name}</h3>
                     <p className="muted">{artist.role}</p>
-                    {artist.bio ? <p className="muted">{artist.bio}</p> : null}
+                    {artist.bio ? <p className="muted measure">{artist.bio}</p> : null}
                   </Card>
                 </div>
               </Reveal>

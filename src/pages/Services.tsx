@@ -27,12 +27,12 @@ export default function Services() {
       <section className="section">
         <div className="wrap">
           <div className="grid grid--2">
-                      {services.map((service) => (
-                        <Reveal key={service.id} variant="rise">
-                          <div style={{ height: "100%" }}>
-                            <Card media={<Monogram mark={service.name.charAt(0)} />}>
-                              <h2 style={{ fontSize: "var(--step-2)" }}>{service.name}</h2>
-                    <p className="muted">{service.summary}</p>
+            {services.map((service, i) => (
+              <Reveal key={service.id} variant="rise" delay={i * 90}>
+                <div style={{ height: "100%" }}>
+                  <Card media={<Monogram mark={service.name.charAt(0)} />}>
+                    <h2 style={{ fontSize: "var(--step-2)" }}>{service.name}</h2>
+                    <p className="muted measure">{service.summary}</p>
                     <ul className="tick-list" style={{ marginTop: "0.4rem" }}>
                       {service.includes.map((line) => (
                         <li key={line}>{line}</li>
@@ -44,10 +44,10 @@ export default function Services() {
                         Add to your estimate
                       </Button>
                     </div>
-                                      </Card>
-                                    </div>
-                                  </Reveal>
-                                ))}
+                  </Card>
+                </div>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>

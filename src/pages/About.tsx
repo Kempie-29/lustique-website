@@ -45,7 +45,7 @@ export default function About() {
           <Reveal>
             <div className="prose">
               <h2>Our story</h2>
-              <p>
+              <p className="dropcap">
                 Lustique Co. began in {site.foundedYear} with a simple idea: that a
                 wedding morning should feel calm. Not rushed, not crowded — just a
                 quiet room, good light, and an artist who already knows you.

@@ -20,7 +20,7 @@ export function JsonLd({ data }: JsonLdProps) {
 }
 
 /** Hosted brand assets referenced from structured data. */
-const LOGO_URL = `${site.url}/assets/logo.svg`;
+const LOGO_URL = `${site.url}/assets/emblem.svg`;
 const SHARE_IMAGE_URL = `${site.url}/assets/og-image.svg`;
 
 /** Cheapest to most-expensive known figure, for `priceRange`. */

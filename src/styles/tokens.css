@@ -23,6 +23,9 @@
   --ink-faint: #8a7d74;
   --line: rgba(58, 46, 38, 0.12);
   --line-strong: rgba(58, 46, 38, 0.22);
+  --rule: rgba(58, 46, 38, 0.16);
+  --rule-strong: rgba(124, 70, 67, 0.4);
+  --plate: rgba(255, 253, 249, 0.9);
 
   --paper: #ffffff;
   --paper-warm: #fffdf9;
@@ -38,6 +41,13 @@
   --step-3: clamp(1.8rem, 1.6rem + 1.1vw, 2.5rem);
   --step-4: clamp(2.3rem, 1.9rem + 2vw, 3.6rem);
   --step-5: clamp(2.8rem, 2rem + 3.6vw, 5rem);
+
+  /* — Measure (line length) & tracking — */
+  --measure: 66ch;
+  --measure-narrow: 52ch;
+  --measure-wide: 72ch;
+  --track-label: 0.22em;
+  --track-caption: 0.16em;
 
   /* — Layout — */
   --wrap: 1180px;
@@ -55,6 +65,7 @@
   --space-lg: 2.2rem;
   --space-xl: clamp(2.6rem, 6vw, 4.5rem);
   --space-2xl: clamp(4rem, 9vw, 7rem);
+  --space-3xl: clamp(5rem, 12vw, 10rem);
 
   /* — Shadow — */
   --shadow-sm: 0 1px 2px rgba(43, 35, 32, 0.06), 0 2px 8px rgba(43, 35, 32, 0.05);
@@ -63,9 +74,14 @@
 
   /* — Motion — */
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-silk: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft: cubic-bezier(0.33, 0, 0.2, 1);
   --dur-fast: 160ms;
   --dur: 320ms;
   --dur-slow: 620ms;
+  --dur-enter: 900ms;
+  --dur-reveal: 1100ms;
+  --stagger: 90ms;
 
   --topbar-h: 40px;
   --header-h: 72px;

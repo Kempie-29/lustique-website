@@ -27,8 +27,8 @@ export default function Journal() {
       <section className="section">
         <div className="wrap--narrow">
           <div className="entry-list">
-            {journal.map((entry) => (
-              <Reveal key={entry.slug} variant="fade">
+            {journal.map((entry, i) => (
+              <Reveal key={entry.slug} variant="fade" delay={i * 70}>
                 <Link to={`/journal/${entry.slug}`} className="entry">
                   <p className="entry__meta">
                     {formatDate(entry.date)} · {entry.readingMinutes} minute read

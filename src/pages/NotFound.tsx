@@ -15,14 +15,14 @@ export default function NotFound() {
     <>
       <Seo
         title="Page not found"
-        description="We couldn't find that page."
+        description="This page isn't here — the link may have moved."
         path={location.pathname}
         noindex
       />
       <PageHero
-        eyebrow="404"
-        title="We couldn't find that page."
-        intro="The link may have moved, or the page may not be ready yet. Let's get you back on track."
+        eyebrow="Not found"
+        title="This page isn't here."
+        intro="The link may have moved, or it may not be ready yet. Nothing is lost — here are a few quiet ways back."
         crumbs={[{ label: "Not found" }]}
       />
       <section className="section">
@@ -38,6 +38,9 @@ export default function NotFound() {
               View the portfolio
             </Button>
           </div>
+          <p className="serif-italic emphasis" style={{ marginTop: "var(--space-lg)" }}>
+            Blessings, The Lustique Cosmetology Team
+          </p>
         </div>
       </section>
     </>

@@ -3,6 +3,7 @@ import { JsonLd, beautySalonSchema, websiteSchema } from "@/components/JsonLd";
 import { Monogram } from "@/components/shell/Monogram";
 import { BlurUpImage } from "@/components/shell/BlurUpImage";
 import { Reveal } from "@/components/shell/Reveal";
+import { RevealText } from "@/components/shell/RevealText";
 import { Testimonials } from "@/components/home/Testimonials";
 import { Button } from "@/components/primitives/Button";
 import { Card } from "@/components/primitives/Card";
@@ -59,7 +60,7 @@ export default function Index() {
       />
       <JsonLd data={[beautySalonSchema(), websiteSchema()]} />
 
-      {/* 1 · Hero */}
+      {/* 1 · Hero — one composed entrance, in sequence */}
       <section className={`hero ${hasHeroPhoto ? "" : "hero--monogram"}`}>
         <div className="hero__media">
           {hasHeroPhoto ? (
@@ -68,6 +69,8 @@ export default function Index() {
               alt={gallery[0].alt}
               loading="eager"
               fetchPriority="high"
+              variant="curtain"
+              kenBurns
             />
           ) : (
             <Monogram mark="LC" />
@@ -75,17 +78,23 @@ export default function Index() {
         </div>
         <div className="hero__scrim" aria-hidden="true" />
         <div className="wrap hero__content">
-          <Reveal>
+          <Reveal variant="fade">
             <p className="eyebrow">Bridal hair &amp; makeup artistry · Pretoria</p>
-            <h1>Feel most like yourself.</h1>
-            <div style={{ marginTop: "1rem" }}>
+          </Reveal>
+          <RevealText as="h1" text="Feel most like yourself." delay={140} />
+          <Reveal variant="fade" delay={360}>
+            <div className="hero__stars">
               <StarRow label="rated by our brides" />
             </div>
+          </Reveal>
+          <Reveal variant="fade" delay={480}>
             <p className="hero__sub">
               Quiet, personal artistry for brides across Pretoria and beyond —
               unhurried mornings, honest pricing, and a look that still feels like
               you.
             </p>
+          </Reveal>
+          <Reveal variant="fade" delay={620}>
             <div className="btn-row">
               <Button to="/quote" variant="primary" size="lg">
                 Get your estimate
@@ -109,18 +118,18 @@ export default function Index() {
         </div>
       </section>
 
-      {/* 3 · Statement */}
-      <section className="section">
+      {/* 3 · Statement — the page's editorial moment */}
+      <section className="section section--airy">
         <div className="wrap statement-grid">
           <Reveal>
-            <p className="eyebrow">Who we are</p>
-            <h2>
-              The artist a bride chooses is the one who makes her feel most like
-              herself.
-            </h2>
+            <p className="eyebrow eyebrow--num" data-num="01">Who we are</p>
+            <RevealText
+                          as="h2"
+                          text="The artist a bride chooses is the one who makes her feel most like herself."
+                        />
           </Reveal>
-          <Reveal variant="fade">
-            <p>
+          <Reveal variant="fade" delay={120}>
+            <p className="dropcap">
               Lustique Co. is a bridal hair and makeup studio in {site.address.suburb},
               Pretoria. We keep our diary deliberately small so every bride gets a
               calm morning, a considered look, and an artist who already knows her
@@ -144,7 +153,7 @@ export default function Index() {
         <div className="wrap">
           <Reveal>
             <div className="section-head">
-              <p className="eyebrow">What we do</p>
+              <p className="eyebrow eyebrow--num" data-num="02">What we do</p>
               <h2>Flawless. Elegant. Unforgettable.</h2>
               <p className="lead">
                 Everything we offer is built around your morning — makeup, hair, or
@@ -154,8 +163,8 @@ export default function Index() {
           </Reveal>
           <div className="grid grid--3">
             {SERVICES.map((service, i) => (
-              <Reveal key={service.title} variant="rise">
-                <div style={{ height: "100%", transitionDelay: `${i * 60}ms` }}>
+              <Reveal key={service.title} variant="rise" delay={i * 90}>
+                <div style={{ height: "100%" }}>
                   <Card media={<Monogram mark={service.title.charAt(0)} />}>
                     <h3>{service.title}</h3>
                     <p className="muted">{service.body}</p>
@@ -165,11 +174,13 @@ export default function Index() {
               </Reveal>
             ))}
           </div>
-          <div className="btn-row cta-line">
-            <Button to="/services" variant="outline">
-              See all services
-            </Button>
-          </div>
+          <Reveal variant="fade" delay={120}>
+            <div className="btn-row cta-line">
+              <Button to="/services" variant="outline">
+                See all services
+              </Button>
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -177,7 +188,7 @@ export default function Index() {
       <section className="section">
         <div className="wrap statement-grid">
           <Reveal>
-            <p className="eyebrow">The team</p>
+            <p className="eyebrow eyebrow--num" data-num="03">The team</p>
             <h2>{numberWord(artistCount)} artists. One quiet morning at a time.</h2>
             <div className="stat-row" style={{ margin: "1.5rem 0" }}>
               <span className="stat">
@@ -190,7 +201,7 @@ export default function Index() {
                 <strong>{site.foundedYear}</strong> Since
               </span>
             </div>
-            <p className="muted">
+            <p className="muted measure">
               A team of {artistCount} artists who work the same way: unhurried,
               precise, and entirely yours on the day.
             </p>
@@ -200,7 +211,7 @@ export default function Index() {
               </Button>
             </div>
           </Reveal>
-          <Reveal variant="fade">
+          <Reveal variant="fade" delay={140}>
             <div className="collage">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Monogram key={i} mark={["A", "B", "C", "D"][i]} />
@@ -215,7 +226,7 @@ export default function Index() {
         <div className="wrap">
           <Reveal>
             <div className="section-head">
-              <p className="eyebrow">Transparent pricing</p>
+              <p className="eyebrow eyebrow--num" data-num="04">Transparent pricing</p>
               <h2>Know your investment before you enquire.</h2>
               <p className="lead">
                 Every figure below is what we actually charge — no surprises on the
@@ -224,12 +235,14 @@ export default function Index() {
             </div>
           </Reveal>
           <div className="grid grid--4">
-            {PRICE_TILES.map((tile) => (
-              <div className="price-tile" key={tile.label}>
-                <span className="price-tile__label">{tile.label}</span>
-                <span className="price-tile__amount">{tile.amount}</span>
-                <span className="price-tile__note">{tile.note}</span>
-              </div>
+            {PRICE_TILES.map((tile, i) => (
+              <Reveal key={tile.label} variant="rise" delay={i * 80}>
+                <div className="price-tile">
+                  <span className="price-tile__label">{tile.label}</span>
+                  <span className="price-tile__amount">{tile.amount}</span>
+                  <span className="price-tile__note">{tile.note}</span>
+                </div>
+              </Reveal>
             ))}
           </div>
           <p className="footnote">
@@ -254,7 +267,7 @@ export default function Index() {
       <section className="section section--tight">
         <div className="wrap statement-grid">
           <Reveal>
-            <p className="eyebrow">For your big day</p>
+            <p className="eyebrow eyebrow--num" data-num="05">For your big day</p>
             <h2>Free guides, from us to you.</h2>
             <p className="lead" style={{ marginTop: "0.9rem" }}>
               Short, practical writing on skin, hair and timing — the things that
@@ -266,7 +279,7 @@ export default function Index() {
               </Button>
             </div>
           </Reveal>
-          <Reveal variant="fade">
+          <Reveal variant="fade" delay={140}>
             <ul className="stack">
               {guides.map((g) => (
                 <li key={g.slug} className="panel">
@@ -289,8 +302,8 @@ export default function Index() {
             <h2>Tell us about your day.</h2>
             <p>
               {activePromotion.meta
-                              ? activePromotion.meta.tagline
-                              : "Build a live estimate in about two minutes — your investment, before you enquire."}
+                ? activePromotion.meta.tagline
+                : "Build a live estimate in about two minutes — your investment, before you enquire."}
             </p>
             <div className="btn-row">
               <Button to="/quote" variant="light" size="lg">

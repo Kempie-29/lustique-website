@@ -6,6 +6,7 @@ import { Button } from "@/components/primitives/Button";
 import { pricingTables } from "@/content/pricingTables";
 import { activePromotion } from "@/content/promotions";
 import { PRICES } from "@/content/pricing";
+import { site } from "@/content/site";
 import { formatZar } from "@/lib/format";
 
 export default function Pricing() {
@@ -28,29 +29,31 @@ export default function Pricing() {
       <section className="section">
         <div className="wrap">
           {activePromotion.meta ? (
-                      <Reveal>
-                        <div className="panel" style={{ marginBottom: "var(--space-xl)" }}>
-                          <p className="eyebrow">Current offer</p>
-                          <h2 style={{ fontSize: "var(--step-2)" }}>{activePromotion.meta.name}</h2>
-                          <p className="muted" style={{ marginTop: "0.6rem" }}>
-                            {activePromotion.meta.tagline}
-                          </p>
-                <p className="field__hint">
-                                  The least-expensive eligible look is the one freed. The bride,
-                                  under-12 flower girls and trials are never freed. Minimum
-                                  bookings and any conditions are confirmed with your estimate.
-                                </p>
-                              </div>
+            <Reveal>
+              <div className="panel" style={{ marginBottom: "var(--space-xl)" }}>
+                <p className="eyebrow">Current offer</p>
+                <h2 style={{ fontSize: "var(--step-2)" }}>{activePromotion.meta.name}</h2>
+                <p className="muted measure" style={{ marginTop: "0.6rem" }}>
+                  {activePromotion.meta.tagline}
+                </p>
+                <p className="field__hint measure">
+                  The least-expensive eligible look is the one freed. The bride,
+                  under-12 flower girls and trials are never freed. Minimum
+                  bookings and any conditions are confirmed with your estimate.
+                </p>
+              </div>
             </Reveal>
           ) : null}
 
           <div className="table-cards">
-            {pricingTables.map((table) => (
-              <Reveal key={table.id} variant="fade">
+            {pricingTables.map((table, i) => (
+              <Reveal key={table.id} variant="fade" delay={i * 80}>
                 <div className="panel">
-                  <h2 style={{ fontSize: "var(--step-2)" }}>{table.title}</h2>
+                  <h2 className="menu-title" style={{ fontSize: "var(--step-2)" }}>
+                    {table.title}
+                  </h2>
                   {table.intro ? (
-                    <p className="muted" style={{ marginTop: "0.5rem", marginBottom: "1rem" }}>
+                    <p className="muted measure" style={{ marginTop: "0.5rem", marginBottom: "1rem" }}>
                       {table.intro}
                     </p>
                   ) : null}
@@ -86,6 +89,12 @@ export default function Pricing() {
             Travel within 40 km round trip of our studio is free ·{" "}
             {formatZar(PRICES.travel.perKm)} per km round trip beyond · prices scale
             with hair length.
+          </p>
+
+          <p className="credibility" style={{ marginTop: "var(--space-md)" }}>
+            <span>Since {site.foundedYear}</span>
+            <span>{site.yearsCombinedExperience} years combined</span>
+            <span>One wedding per morning</span>
           </p>
 
           <div className="btn-row cta-line">

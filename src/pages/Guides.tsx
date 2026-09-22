@@ -26,8 +26,8 @@ export default function Guides() {
       <section className="section">
         <div className="wrap--narrow">
           <div className="entry-list">
-            {guides.map((guide) => (
-              <Reveal key={guide.slug} variant="fade">
+            {guides.map((guide, i) => (
+              <Reveal key={guide.slug} variant="fade" delay={i * 70}>
                 <Link to={`/guides/${guide.slug}`} className="entry">
                   <p className="entry__meta">{guide.readingMinutes} minute read</p>
                   <h2 style={{ fontSize: "var(--step-2)" }}>{guide.title}</h2>

@@ -37,6 +37,7 @@ export function Testimonials({ items }: TestimonialsProps) {
     <section className="section section--tight" aria-label="What our brides say">
       <div className="wrap">
         <div className="testimonial">
+          <p className="caption center">Verified reviews · in their words</p>
           <StarRow value={current.rating} className="star-row--ink" />
           <blockquote>{current.quote}</blockquote>
           <p className="testimonial__author">

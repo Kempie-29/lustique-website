@@ -79,7 +79,7 @@ export default function Portfolio() {
                 <div className="gallery-grid">
                   {shown.map((item) => (
                     <figure className="gallery-item" key={item.id}>
-                      <BlurUpImage src={item.imageUrl} alt={item.alt} />
+                      <BlurUpImage src={item.imageUrl} alt={item.alt} variant="curtain" />
                     </figure>
                   ))}
                 </div>

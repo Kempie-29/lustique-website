@@ -5,7 +5,7 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#FBF8F3",
+  "background_color": "#FAF6F0",
   "theme_color": "#9E5F58",
   "icons": [
     {
@@ -15,7 +15,13 @@
       "purpose": "any"
     },
     {
-      "src": "/assets/logo.svg",
+      "src": "/assets/emblem.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon-maskable.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "maskable"

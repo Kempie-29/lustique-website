@@ -34,6 +34,9 @@ h1, h2, h3, h4 {
   letter-spacing: -0.01em;
   margin: 0;
   color: var(--ink);
+  /* Keeps opening quotes and terminal punctuation outside the measure. */
+  hanging-punctuation: first last;
+  text-wrap: balance;
 }
 
 h1 { font-size: var(--step-5); }
@@ -76,6 +79,8 @@ address { font-style: normal; }
   font-size: var(--step-1);
   color: var(--ink-soft);
   line-height: 1.6;
+  max-width: var(--measure);
+  text-wrap: pretty;
 }
 
 .serif-italic {
@@ -86,6 +91,50 @@ address { font-style: normal; }
 .muted { color: var(--ink-soft); }
 .center { text-align: center; }
 .tabular { font-variant-numeric: tabular-nums; }
+
+/* — Measure (line length) — */
+.measure { max-width: var(--measure); }
+.measure--narrow { max-width: var(--measure-narrow); }
+.measure--wide { max-width: var(--measure-wide); }
+
+/* — Editorial typography — */
+.emphasis {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--rose-ink);
+}
+
+.caption {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  letter-spacing: var(--track-caption);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+
+/* A single oversized statement per page — the deliberate editorial moment. */
+.editorial {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--step-4);
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+  max-width: 24ch;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+/* Drop cap for the opening paragraph of an editorial block. */
+.dropcap::first-letter {
+  float: left;
+  font-family: var(--font-display);
+  font-size: 3.5em;
+  line-height: 0.72;
+  padding: 0.06em 0.14em 0 0;
+  color: var(--rose-deep);
+}
 
 /* — Skip link — */
 .skip-link {
@@ -124,11 +173,13 @@ address { font-style: normal; }
   background-size: 220px 220px;
 }
 
-/* — Reveal — */
+/* — Reveal — slow, decelerating, staggered via --reveal-delay — */
 .reveal {
   opacity: 0;
   transform: translateY(22px);
-  transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease);
+  transition: opacity var(--dur-reveal) var(--ease-silk), transform var(--dur-reveal) var(--ease-silk);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
 }
 .reveal.is-visible {
   opacity: 1;
@@ -137,6 +188,22 @@ address { font-style: normal; }
 .reveal--rise-lg { transform: translateY(38px); }
 .reveal--fade { transform: none; }
 
+/* — Masked text reveal for display headings (robust across wraps) — */
+.reveal-text { display: block; }
+.reveal-text__inner {
+  display: block;
+  clip-path: inset(0 0 100% 0);
+  transform: translateY(0.4em);
+  transition: clip-path var(--dur-reveal) var(--ease-silk),
+    transform var(--dur-reveal) var(--ease-silk);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: clip-path, transform;
+}
+.reveal-text.is-visible .reveal-text__inner {
+  clip-path: inset(-18% -14% -18% -14%);
+  transform: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .reveal {
@@ -144,9 +211,15 @@ address { font-style: normal; }
     transform: none !important;
     transition: none !important;
   }
+  .reveal-text__inner {
+      clip-path: none !important;
+      transform: none !important;
+      transition: none !important;
+    }
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
   }
 }
 
@@ -175,4 +248,46 @@ address { font-style: normal; }
   padding-block: var(--space-2xl);
 }
 .section--tight { padding-block: var(--space-xl); }
+.section--airy { padding-block: var(--space-3xl); }
 .stack > * + * { margin-top: var(--space-md); }
+.stack-sm > * + * { margin-top: var(--space-sm); }
+
+/* — Hairline rules & tempo — */
+.rule {
+  border: 0;
+  height: 1px;
+  background: var(--rule);
+  margin: 0;
+}
+.rule--inset {
+  width: min(100% - (var(--gutter) * 2), var(--wrap));
+  margin-inline: auto;
+}
+/* Full-bleed band that breaks out of a contained wrapper. */
+.bleed {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+}
+/* Wide cinematic band — 16:9, cropped not squashed. */
+.band {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+.band img,
+.band .ph,
+.band .ph img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Offset column for asymmetric, non-centred layouts. */
+@media (min-width: 900px) {
+  .offset-end { margin-left: auto; }
+}
+
+/* Quiet numbered section label — "01 — Services". */
+.eyebrow--num::before {
+  content: attr(data-num) " — ";
+  color: var(--rose);
+  font-variant-numeric: tabular-nums;
+}

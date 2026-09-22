@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Brand } from "@/components/shell/Brand";
+import { Logo } from "@/components/shell/Logo";
 import { NAV_ITEMS } from "@/components/shell/Header";
 import { directionsLink, site, whatsappLink } from "@/content/site";
 
@@ -13,7 +13,9 @@ export function Footer() {
       <div className="wrap">
         <div className="footer-grid">
           <div className="footer-col footer-brand">
-            <Brand />
+            <Link to="/" className="footer-brand-link" aria-label={`${site.name} — home`}>
+              <Logo variant="full" className="footer-logo" alt="" />
+            </Link>
             <p>
               Bridal hair &amp; makeup artistry from {site.address.suburb}, Pretoria.
               Quiet, personal, and unhurried — from trial to touch-up.

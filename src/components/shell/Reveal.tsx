@@ -1,14 +1,16 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 interface RevealProps {
   children: ReactNode;
   className?: string;
   /** "fade" for a pure opacity reveal, "rise" (default) to also slide up. */
   variant?: "fade" | "rise" | "rise-lg";
+  /** Delay before this item animates in — use for staggered sequences (ms). */
+  delay?: number;
 }
 
 /** Scroll-reveal via IntersectionObserver, disabled under reduced motion. */
-export function Reveal({ children, className = "", variant = "rise" }: RevealProps) {
+export function Reveal({ children, className = "", variant = "rise", delay = 0 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -40,8 +42,14 @@ export function Reveal({ children, className = "", variant = "rise" }: RevealPro
   const variantClass =
     variant === "fade" ? "reveal--fade" : variant === "rise-lg" ? "reveal--rise-lg" : "";
 
+  const style = delay ? ({ "--reveal-delay": `${delay}ms` } as CSSProperties) : undefined;
+
   return (
-    <div ref={ref} className={`reveal ${variantClass} ${visible ? "is-visible" : ""} ${className}`.trim()}>
+    <div
+      ref={ref}
+      style={style}
+      className={`reveal ${variantClass} ${visible ? "is-visible" : ""} ${className}`.trim()}
+    >
       {children}
     </div>
   );

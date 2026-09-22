@@ -28,8 +28,7 @@ export function DashboardLayout() {
     <div className="dash">
       <aside className="dash__rail">
         <NavLink to="/" className="dash__brand" aria-label="Lustique Co. — home">
-          <Logo variant="emblem" className="logo--sm" alt="" />
-          <span>Lustique</span>
+          <Logo variant="full" onDark className="dash__logo" alt="" />
         </NavLink>
 
         <p className="dash__role">{isAdmin ? "Owner control panel" : "Artist workspace"}</p>

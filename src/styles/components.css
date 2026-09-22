@@ -8,6 +8,9 @@
   --btn-bg: var(--ink);
   --btn-fg: var(--ivory);
   --btn-bd: transparent;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -28,6 +31,20 @@
   white-space: nowrap;
   line-height: 1.1;
 }
+/* Quiet fill sweep, drawn left to right on hover. */
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: currentColor;
+  opacity: 0.09;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--dur) var(--ease-soft);
+}
+.btn:hover::before,
+.btn:focus-visible::before { transform: scaleX(1); }
 .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
 .btn:active { transform: translateY(0); }
 .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
@@ -104,9 +121,31 @@
   min-height: var(--header-h);
 }
 /* ————— Logo ————— */
-.logo { display: block; height: auto; max-width: 100%; }
-.logo--emblem { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; }
-.logo--full { width: auto; height: 64px; object-fit: contain; }
+.logo {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  overflow: hidden;
+  transition: box-shadow var(--dur) var(--ease);
+}
+.logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 45%;
+}
+.logo--emblem { width: 44px; height: 44px; border-radius: 12px; }
+.logo--full { width: auto; height: 62px; border-radius: 8px; }
+.logo--full img { width: auto; height: 100%; object-fit: contain; }
+/* On dark surfaces the white-ground JPG sits on an ivory plate — never white-on-dark. */
+.logo--on-dark {
+  background: var(--ivory);
+  padding: 6px;
+  border-radius: 12px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.55) inset, 0 6px 20px rgba(28, 20, 18, 0.2);
+}
+.logo--on-dark.logo--full { padding: 10px 16px; border-radius: 14px; }
 
 .brand {
   display: inline-flex;
@@ -118,7 +157,6 @@
   width: 42px;
   height: 42px;
   border-radius: 12px;
-  object-fit: cover;
   flex: none;
 }
 .brand-word {
@@ -138,19 +176,31 @@
   gap: 1.5rem;
 }
 .nav-link {
+  position: relative;
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: var(--ink-soft);
   padding: 0.4rem 0;
-  border-bottom: 1px solid transparent;
-  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  transition: color var(--dur) var(--ease);
+}
+/* Underline drawn in from the left — no resting rule. */
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.15rem;
+  height: 1px;
+  background: var(--rose-deep);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--dur) var(--ease-soft);
 }
 .nav-link:hover { color: var(--ink); }
-.nav-link[aria-current="page"] {
-  color: var(--ink);
-  border-bottom-color: var(--rose-deep);
-}
+.nav-link:hover::after,
+.nav-link[aria-current="page"]::after { transform: scaleX(1); }
+.nav-link[aria-current="page"] { color: var(--ink); }
 .header-actions {
   display: none;
   align-items: center;
@@ -284,6 +334,7 @@
   max-width: 46ch;
 }
 .hero .btn-row { margin-top: 1.8rem; }
+.hero__stars { margin-top: 1.1rem; }
 .hero--monogram {
   background: linear-gradient(160deg, var(--rose-ink), var(--rose-deep) 55%, var(--burgundy));
 }
@@ -380,7 +431,15 @@
 .card__media {
   aspect-ratio: 4 / 5;
   background: var(--ivory-deep);
+  overflow: hidden;
 }
+.card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-slow) var(--ease-silk);
+}
+.card:hover .card__media img { transform: scale(1.045); }
 .card__body {
   padding: var(--space-md);
   display: flex;
@@ -524,7 +583,10 @@
   text-align: center;
   max-width: 48rem;
   margin-inline: auto;
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--rule);
 }
+.testimonial .caption { margin-bottom: 1.3rem; }
 .testimonial blockquote {
   margin: 1.4rem 0 1rem;
   font-family: var(--font-display);
@@ -583,7 +645,8 @@
 }
 .footer-col li { margin-bottom: 0.55rem; font-size: var(--step--1); color: var(--ink-soft); }
 .footer-col a:hover { color: var(--ink); }
-.footer-brand .brand-word { font-size: 1.7rem; }
+.footer-brand-link { display: inline-block; }
+.footer-brand .footer-logo { height: 66px; margin-bottom: 0.2rem; }
 .footer-brand p { font-size: var(--step--1); color: var(--ink-soft); max-width: 30ch; margin-top: 0.8rem; }
 .footer-bottom {
   border-top: 1px solid var(--line);
@@ -997,7 +1060,7 @@
   font-weight: 600;
 }
 
-/* ————— Price tables ————— */
+/* ————— Price tables — presented as a considered menu, not a sale ————— */
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .price-table {
   width: 100%;
@@ -1007,39 +1070,87 @@
 .price-table caption {
   text-align: left;
   font-size: var(--step--1);
+  letter-spacing: var(--track-caption);
+  text-transform: uppercase;
   color: var(--ink-faint);
   padding-bottom: 0.6rem;
 }
 .price-table th,
 .price-table td {
   text-align: left;
-  padding: 0.75rem 0.6rem;
-  border-bottom: 1px solid var(--line);
+  padding: 0.95rem 0.4rem;
+  border-bottom: 1px solid var(--rule);
   vertical-align: top;
 }
-.price-table th {
+.price-table thead th {
   font-family: var(--font-body);
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
+  font-size: 0.68rem;
+  letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--ink-faint);
   font-weight: 500;
+  border-bottom-color: var(--line-strong);
+  padding-bottom: 0.6rem;
+}
+.price-table tbody tr { transition: background var(--dur) var(--ease-soft); }
+.price-table tbody tr:hover { background: var(--paper-warm); }
+.price-table td:first-child {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  color: var(--ink);
 }
 .price-table td:last-child {
   text-align: right;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-  color: var(--ink);
+  color: var(--rose-ink);
   font-weight: 500;
+  font-size: var(--step-0);
+  letter-spacing: 0.01em;
 }
 .price-table td .row-note {
   display: block;
+  font-family: var(--font-body);
   font-size: var(--step--1);
   color: var(--ink-faint);
   font-weight: 350;
+  letter-spacing: 0;
   white-space: normal;
+  margin-top: 0.15rem;
 }
-.table-cards { display: grid; gap: var(--space-lg); }
+.table-cards { display: grid; gap: var(--space-xl); }
+/* Menu section heading — a hairline rule does the grouping, not a box. */
+.menu-title {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+.menu-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+/* Quiet credibility caption. */
+.credibility {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  align-items: center;
+  font-size: var(--step--1);
+  letter-spacing: var(--track-caption);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.credibility span { display: inline-flex; align-items: center; gap: 0.55rem; }
+.credibility span::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--rose);
+}
 
 /* ————— Gallery ————— */
 .filter-row {
@@ -1077,8 +1188,16 @@
   border-radius: var(--radius);
   overflow: hidden;
   border: 1px solid var(--line);
+  animation: panel-in var(--dur-enter) var(--ease-silk) both;
 }
 .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+.gallery-item:nth-child(2) { animation-delay: 70ms; }
+.gallery-item:nth-child(3) { animation-delay: 140ms; }
+.gallery-item:nth-child(4) { animation-delay: 210ms; }
+.gallery-item:nth-child(5) { animation-delay: 280ms; }
+.gallery-item:nth-child(6) { animation-delay: 350ms; }
+.gallery-item:nth-child(7) { animation-delay: 420ms; }
+.gallery-item:nth-child(8) { animation-delay: 490ms; }
 
 /* ————— Empty state ————— */
 .empty-state {
@@ -1245,10 +1364,48 @@
 
 /* ————— Progressive (blur-up) images ————— */
 .ph { display: contents; }
-.ph img { transition: opacity 0.6s var(--ease), filter 0.6s var(--ease); }
+.ph img {
+  transition: opacity 0.6s var(--ease), filter 0.6s var(--ease),
+    transform var(--dur-slow) var(--ease-silk);
+}
 html.js .ph img { opacity: 0; filter: blur(14px); }
 html.js .ph.loaded img,
 html.js .ph.img-error img { opacity: 1; filter: none; }
+
+/* Curtain: a panel lifts to reveal the photograph as it settles. */
+.ph--curtain {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.ph--curtain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ivory-deep);
+  transform: scaleY(1);
+  transform-origin: top;
+  transition: transform var(--dur-reveal) var(--ease-silk);
+  pointer-events: none;
+}
+.ph--curtain.loaded::after,
+.ph--curtain.img-error::after { transform: scaleY(0); }
+.ph--curtain img {
+  transition: opacity 0.9s var(--ease-silk), filter 0.9s var(--ease-silk),
+    transform 1.6s var(--ease-silk);
+}
+html.js .ph--curtain img { opacity: 0; filter: blur(12px); transform: scale(1.08); }
+html.js .ph--curtain.loaded img,
+html.js .ph--curtain.img-error img { opacity: 1; filter: none; transform: scale(1); }
+
+/* Barely-there Ken Burns drift, only after load and never under reduced motion. */
+@keyframes kenburns {
+  from { transform: scale(1.02); }
+  to { transform: scale(1.1) translate3d(0, -1.2%, 0); }
+}
+.ph--kenburns.loaded img { animation: kenburns 26s var(--ease-soft) forwards; }
 
 /* ————— Header states (behaviour) ————— */
 .site-header.scrolled { box-shadow: var(--shadow-md); }
@@ -1341,6 +1498,9 @@ html.js .ph.img-error img { opacity: 1; filter: none; }
 @media (prefers-reduced-motion: reduce) {
   .ph img { transition: none; }
   html.js .ph img { opacity: 1; filter: none; }
+  .ph--curtain::after { transform: scaleY(0); transition: none; }
+  html.js .ph--curtain img { transform: none; }
+  .ph--kenburns.loaded img { animation: none; }
   .accordion__panel,
   .form-progress > span { transition: none; }
 }
@@ -1348,8 +1508,6 @@ html.js .ph.img-error img { opacity: 1; filter: none; }
 /* ============================================================
    Auth · Dashboard · Portal · Chat
    ============================================================ */
-
-.logo--sm { width: 30px; height: 30px; border-radius: 9px; }
 
 /* ————— Auth ————— */
 .auth-shell {
@@ -1428,6 +1586,7 @@ html.js .ph.img-error img { opacity: 1; filter: none; }
   font-size: 1.35rem;
   color: var(--ivory);
 }
+.dash__logo { height: 54px; }
 .dash__role {
   font-size: 0.66rem;
   letter-spacing: 0.16em;
@@ -1610,3 +1769,51 @@ html.js .ph.img-error img { opacity: 1; filter: none; }
 .timeline__step.is-current .timeline__dot { box-shadow: 0 0 0 4px rgba(158, 95, 88, 0.2); }
 .timeline__step.is-done .timeline__label { color: var(--ink); }
 .timeline__label { font-size: var(--step--1); color: var(--ink-faint); }
+
+/* ————— Portal & dashboard: calm entrances ————— */
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes timeline-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes chat-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+.portal__panel,
+.dash__panel {
+  animation: panel-in var(--dur-enter) var(--ease-silk) both;
+}
+.portal__panel:nth-of-type(2),
+.dash__panel:nth-of-type(2) { animation-delay: 120ms; }
+.portal__panel:nth-of-type(3),
+.dash__panel:nth-of-type(3) { animation-delay: 220ms; }
+
+.timeline__step { animation: timeline-in var(--dur-enter) var(--ease-silk) both; }
+.timeline__step:nth-child(1) { animation-delay: 80ms; }
+.timeline__step:nth-child(2) { animation-delay: 170ms; }
+.timeline__step:nth-child(3) { animation-delay: 260ms; }
+.timeline__step:nth-child(4) { animation-delay: 350ms; }
+.timeline__step:nth-child(5) { animation-delay: 440ms; }
+.timeline__step:nth-child(6) { animation-delay: 530ms; }
+.timeline__step.is-current .timeline__dot { animation: panel-in var(--dur-enter) var(--ease-silk) both; }
+
+.chat { animation: chat-in var(--dur-enter) var(--ease-silk) both; }
+
+/* More air through the product surfaces. */
+.portal__panel,
+.dash__panel { padding: clamp(1.4rem, 4vw, 1.9rem) clamp(1.4rem, 4vw, 1.9rem); }
+.portal__panel h2,
+.dash__panel-head h2 { margin-bottom: 1.1rem; }
+.dash__main { padding: clamp(1.4rem, 4vw, 2.8rem); }
+
+@media print {
+  .portal__panel,
+  .dash__panel,
+  .timeline__step,
+  .chat { animation: none !important; }
+}
