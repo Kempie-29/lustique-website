@@ -135,7 +135,9 @@
   object-fit: cover;
   object-position: 50% 45%;
 }
-.logo--emblem { width: 44px; height: 44px; border-radius: 12px; }
+/* Integral sizes only — no fractional scaling, so the mark stays sharp. */
+.logo--emblem { width: 46px; height: 46px; border-radius: 12px; }
+.logo--emblem img { object-fit: contain; object-position: center; }
 .logo--full { width: auto; height: 62px; border-radius: 8px; }
 .logo--full img { width: auto; height: 100%; object-fit: contain; }
 /* On dark surfaces the white-ground JPG sits on an ivory plate — never white-on-dark. */
@@ -154,8 +156,8 @@
   margin-right: auto;
 }
 .brand-mark {
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   border-radius: 12px;
   flex: none;
 }
@@ -170,16 +172,20 @@
   color: var(--rose-deep);
 }
 
+/* Eight links + the actions must never crowd or wrap: the desktop nav only
+   appears once there is genuinely room for it (see the 1100px breakpoint). */
 .nav {
   display: none;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 .nav-link {
   position: relative;
+  flex: none;
+  white-space: nowrap;
   font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.11em;
   color: var(--ink-soft);
   padding: 0.4rem 0;
   transition: color var(--dur) var(--ease);
@@ -255,8 +261,11 @@
   gap: 0.7rem;
   margin-top: var(--space-md);
 }
+.mobile-nav a[aria-current="page"] {
+  color: var(--rose-deep);
+}
 
-@media (min-width: 1000px) {
+@media (min-width: 1100px) {
   .nav, .header-actions { display: flex; }
   .hamburger { display: none; }
   .mobile-nav { display: none; }
@@ -274,19 +283,41 @@
 /* ————— Breadcrumbs ————— */
 .breadcrumbs {
   font-size: 0.72rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--ink-soft);
   margin-bottom: 1.4rem;
 }
 .breadcrumbs ol {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
   align-items: center;
+  gap: 0.45rem;
+  row-gap: 0.2rem;
+}
+.breadcrumbs li {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+/* Separator drawn in CSS, so the markup carries only labels. */
+.breadcrumbs li + li::before {
+  content: "›";
+  margin-right: 0.45rem;
+  color: var(--rose);
+}
+.breadcrumbs a {
+  color: var(--ink-soft);
+  transition: color var(--dur) var(--ease);
 }
 .breadcrumbs a:hover { color: var(--ink); }
-.breadcrumbs [aria-current="page"] { color: var(--ink-soft); }
+.breadcrumbs [aria-current="page"] {
+  color: var(--ink);
+  max-width: 34ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 /* ————— Home hero ————— */
 .hero {
@@ -659,8 +690,26 @@
   font-size: var(--step--1);
   color: var(--ink-faint);
 }
-.footer-bottom nav { display: flex; flex-wrap: wrap; gap: 1rem; }
+.footer-bottom nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+}
 .footer-bottom a:hover { color: var(--ink); }
+/* The cookie control reads as a peer of the legal links, not a button. */
+.footer-bottom button {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.footer-bottom button:hover { color: var(--ink); }
 .footer-bottom .blessing { font-family: var(--font-display); font-style: italic; color: var(--rose-ink); }
 
 /* ————— Cookie banner ————— */
@@ -1295,10 +1344,10 @@
   z-index: 40;
   left: 0;
   right: 0;
-  top: calc(100% - 0.6rem);
+  top: calc(100% - 0.85rem);
   list-style: none;
   margin: 0;
-  padding: 0.35rem;
+  padding: 0.3rem;
   background: #fff;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
@@ -1311,24 +1360,60 @@
   display: flex;
   justify-content: space-between;
   gap: var(--space-sm);
-  align-items: center;
+  align-items: baseline;
   background: transparent;
   border: 0;
   cursor: pointer;
   padding: 0.6rem 0.7rem;
-  border-radius: var(--radius);
+  border-radius: calc(var(--radius) - 4px);
   text-align: left;
   font-size: var(--step--1);
   color: var(--ink);
+  transition: background var(--dur-fast) var(--ease);
 }
-.venue-suggestions button:hover { background: var(--paper-warm); }
+.venue-suggestions button:hover,
+.venue-suggestions button:focus-visible { background: var(--paper-warm); }
+.venue-suggestions__label { min-width: 0; }
 .venue-suggestions__tag {
   font-size: 0.66rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
   color: var(--rose-deep);
   white-space: nowrap;
 }
+.venue-suggestions__attribution {
+  padding: 0.45rem 0.7rem 0.2rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  border-top: 1px solid var(--line);
+  margin-top: 0.25rem;
+}
+
+/* Inline type-ahead feedback — idle → searching → results / no matches. */
+.venue-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.5rem;
+  margin: -0.7rem 0 var(--space-md);
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+.venue-status--searching { color: var(--ink-faint); }
+.venue-status__link {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: var(--rose-deep);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.venue-status__link:hover { color: var(--rose-ink); }
 .destination-panel {
   background: var(--champagne-soft);
   border: 1px solid var(--line-strong);

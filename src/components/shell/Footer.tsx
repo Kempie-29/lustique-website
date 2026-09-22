@@ -99,15 +99,9 @@ export function Footer() {
             <span>© 2026 {site.name} · Pretoria</span>
             <Link to="/terms">Terms</Link>
             <Link to="/privacy">Privacy</Link>
-            <button
-              type="button"
-              id="manageCookies"
-              className="nav-link"
-              style={{ background: "none", border: 0, cursor: "pointer", padding: 0 }}
-              onClick={manageCookies}
-            >
-              Manage cookies
-            </button>
+            <button type="button" id="manageCookies" onClick={manageCookies}>
+                          Manage cookies
+                        </button>
           </nav>
           <span className="blessing">Blessings, The Lustique Cosmetology Team</span>
         </div>

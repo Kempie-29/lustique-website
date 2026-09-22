@@ -2,6 +2,8 @@
 
 interface ImportMetaEnv {
   readonly VITE_HERE_API_KEY?: string;
+  /** Documented alias for `VITE_HERE_API_KEY` — either name unlocks HERE. */
+  readonly VITE_MAPS_API_KEY?: string;
   readonly VITE_ENQUIRY_ENDPOINT?: string;
   readonly VITE_GA_ID?: string;
   /** Public Supabase project URL (safe to ship — anon key only). */

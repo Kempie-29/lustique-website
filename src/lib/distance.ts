@@ -6,6 +6,8 @@
  *
  * Resolution order (mirrors live): built-in directory → HERE geocode →
  * HERE autosuggest → OSRM driving distance.
+ * Type-ahead order: built-in directory → HERE (if a key is set) → keyless
+ * OpenStreetMap Nominatim, so the suggesting UI still responds with no key.
  * Origin: Lustique Co. studio, La Montagne, Pretoria.
  */
 
@@ -158,9 +160,18 @@ export function accommodationEstimate(artists: number): number {
   return n * TRAVEL_RULES.accommodationPerArtistNight * TRAVEL_RULES.accommodationNights;
 }
 
+/**
+ * The HERE key, read from either documented name. `VITE_HERE_API_KEY` is the
+ * canonical one; `VITE_MAPS_API_KEY` is accepted as an alias so an existing
+ * deploy keeps working without a rename.
+ */
 export function getHereApiKey(): string | undefined {
-  const key = import.meta.env?.VITE_HERE_API_KEY as string | undefined;
-  return key && key.trim().length > 0 ? key : undefined;
+  const env = import.meta.env;
+  const names = [env?.VITE_HERE_API_KEY, env?.VITE_MAPS_API_KEY] as (string | undefined)[];
+  for (const name of names) {
+    if (name && name.trim().length > 0) return name;
+  }
+  return undefined;
 }
 
 export function hasHereKey(): boolean {
@@ -185,7 +196,7 @@ async function osrmDriveKm(lat: number, lng: number): Promise<number | null> {
 }
 
 /** Resolve coordinates to a travel estimate, preferring OSRM, then haversine. */
-async function travelFromCoords(lat: number, lng: number): Promise<TravelEstimate> {
+export async function travelToCoords(lat: number, lng: number): Promise<TravelEstimate> {
   const driveKm = await osrmDriveKm(lat, lng);
   if (driveKm != null) return computeTravel(driveKm);
   return travelFromLatLng(lat, lng);
@@ -228,18 +239,18 @@ export async function resolveDistance(address: string): Promise<TravelEstimate> 
 
   // 1. Built-in directory — free, offline, instant.
   const match = findVenueInDirectory(text);
-  if (match) return travelFromCoords(match.venue.lat, match.venue.lng);
+  if (match) return travelToCoords(match.venue.lat, match.venue.lng);
 
   // 2. HERE geocode (only with a key).
   const key = getHereApiKey();
   if (!key) return unknownTravel();
 
   const coords = await hereGeocode(text, key);
-  if (coords) return travelFromCoords(coords.lat, coords.lng);
+  if (coords) return travelToCoords(coords.lat, coords.lng);
 
   // 3. HERE autosuggest — take the first suggested position as a last resort.
   const suggested = await hereAutosuggest(text, key);
-  if (suggested) return travelFromCoords(suggested.lat, suggested.lng);
+  if (suggested) return travelToCoords(suggested.lat, suggested.lng);
 
   return unknownTravel();
 }
@@ -272,10 +283,81 @@ export interface VenueSuggestion {
   lat: number;
   lng: number;
   verified: boolean;
-  source: "directory" | "here";
+  source: "directory" | "here" | "nominatim";
 }
 
-/** Suggestions for the type-ahead: verified directory hits, then HERE. */
+/** Attribution shown wherever keyless OpenStreetMap results appear. */
+export const NOMINATIM_ATTRIBUTION = "Search results © OpenStreetMap contributors";
+
+/** HERE autosuggest mapped to suggestions (only called when a key is set). */
+async function hereSuggest(
+  text: string,
+  limit: number,
+  key: string,
+): Promise<VenueSuggestion[]> {
+  try {
+    const url =
+      `https://autosuggest.search.hereapi.com/v1/autosuggest?q=${encodeURIComponent(text)}` +
+      `&in=countryCode:ZAF&at=${ORIGIN.lat},${ORIGIN.lng}&limit=${limit}&apiKey=${key}`;
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const data = (await res.json()) as {
+      items?: { title?: string; position?: { lat: number; lng: number } }[];
+    };
+    return (data.items ?? [])
+      .filter((i) => i.position && i.title)
+      .map<VenueSuggestion>((i) => ({
+        label: i.title as string,
+        lat: (i.position as { lat: number; lng: number }).lat,
+        lng: (i.position as { lat: number; lng: number }).lng,
+        verified: false,
+        source: "here",
+      }));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Keyless geocoding via OpenStreetMap Nominatim — used only when no HERE key is
+ * configured, so the type-ahead still responds. Nominatim is a free public
+ * service with a fair-use policy: results are debounced by the caller and the
+ * request carries a contact email, per their usage requirements.
+ */
+async function nominatimSuggest(text: string, limit: number): Promise<VenueSuggestion[]> {
+  if (limit < 1) return [];
+  try {
+    const url =
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(text)}` +
+      `&format=jsonv2&limit=${limit}&countrycodes=za&accept-language=en` +
+      `&email=${encodeURIComponent(site.email)}`;
+    const res = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!res.ok) return [];
+    const data = (await res.json()) as { display_name?: string; lat?: string; lon?: string }[];
+    return (data ?? [])
+      .map((item) => ({
+        label: item.display_name ?? "",
+        lat: Number(item.lat),
+        lng: Number(item.lon),
+      }))
+      .filter((i) => i.label.length > 0 && Number.isFinite(i.lat) && Number.isFinite(i.lng))
+      .map<VenueSuggestion>((i) => ({
+        label: i.label,
+        lat: i.lat,
+        lng: i.lng,
+        verified: false,
+        source: "nominatim",
+      }));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Suggestions for the type-ahead. Resolution order mirrors the rest of the
+ * adapter: built-in directory → HERE (when a key is set) → keyless Nominatim.
+ * Never invents a venue: an empty array simply means "no matches".
+ */
 export async function suggestVenues(
   query: string,
   limit = 5,
@@ -290,30 +372,14 @@ export async function suggestVenues(
     verified: m.venue.verified,
     source: "directory",
   }));
+  if (directory.length >= limit) return directory;
 
   const key = getHereApiKey();
-  if (!key || directory.length >= limit) return directory;
-
-  try {
-    const url =
-      `https://autosuggest.search.hereapi.com/v1/autosuggest?q=${encodeURIComponent(text)}` +
-      `&in=countryCode:ZAF&at=${ORIGIN.lat},${ORIGIN.lng}&limit=${limit}&apiKey=${key}`;
-    const res = await fetch(url);
-    if (!res.ok) return directory;
-    const data = (await res.json()) as {
-      items?: { title?: string; position?: { lat: number; lng: number } }[];
-    };
-    const external = (data.items ?? [])
-      .filter((i) => i.position && i.title)
-      .map<VenueSuggestion>((i) => ({
-        label: i.title as string,
-        lat: (i.position as { lat: number; lng: number }).lat,
-        lng: (i.position as { lat: number; lng: number }).lng,
-        verified: false,
-        source: "here",
-      }));
-    return [...directory, ...external].slice(0, limit);
-  } catch {
-    return directory;
+  if (key) {
+    const here = await hereSuggest(text, limit - directory.length, key);
+    if (here.length > 0) return [...directory, ...here].slice(0, limit);
   }
+
+  const osm = await nominatimSuggest(text, limit - directory.length);
+  return [...directory, ...osm].slice(0, limit);
 }

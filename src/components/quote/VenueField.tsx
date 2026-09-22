@@ -8,6 +8,9 @@ import {
   resolveDistance,
   suggestVenues,
   travelFromBand,
+  travelToCoords,
+  unknownTravel,
+  NOMINATIM_ATTRIBUTION,
   type TravelEstimate,
   type VenueSuggestion,
 } from "@/lib/distance";
@@ -25,10 +28,18 @@ interface VenueFieldProps {
 }
 
 /**
+ * Type-ahead lifecycle. `idle` before two characters; `searching` while the
+ * debounced lookup is in flight; `results` when matches exist; `empty` when the
+ * lookup settled with nothing — the state that previously left the field
+ * silently unresponsive.
+ */
+type SuggestStatus = "idle" | "searching" | "results" | "empty";
+
+/**
  * Venue entry with graceful degradation:
- * - type-ahead suggestions (verified directory hits first, then HERE);
+ * - type-ahead suggestions (built-in directory → HERE → keyless OpenStreetMap);
  * - "find on map" resolves through directory → HERE → OSRM;
- * - with no HERE key, falls back to the manual distance bands.
+ * - with nothing resolvable, falls back to the manual distance bands.
  */
 export function VenueField({
   form,
@@ -41,24 +52,31 @@ export function VenueField({
   requireVenue,
 }: VenueFieldProps) {
   const [suggestions, setSuggestions] = useState<VenueSuggestion[]>([]);
+  const [status, setStatus] = useState<SuggestStatus>("idle");
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [focusBand, setFocusBand] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const query = form.venueName.trim();
     if (query.length < 2) {
       setSuggestions([]);
+      setStatus("idle");
+      setOpen(false);
       return;
     }
+
     let active = true;
+    setStatus("searching");
     const handle = window.setTimeout(async () => {
       const next = await suggestVenues(query, 5);
-      if (active) {
-        setSuggestions(next);
-        setOpen(next.length > 0);
-      }
+      if (!active) return;
+      setSuggestions(next);
+      setStatus(next.length > 0 ? "results" : "empty");
+      setOpen(next.length > 0);
     }, 250);
+
     return () => {
       active = false;
       window.clearTimeout(handle);
@@ -73,8 +91,20 @@ export function VenueField({
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
+  // Move focus to the distance-band select once it has rendered.
+  useEffect(() => {
+    if (!focusBand) return;
+    const select = document.getElementById("distanceBand") as HTMLSelectElement | null;
+    if (select) {
+      select.scrollIntoView({ block: "center", behavior: "smooth" });
+      select.focus();
+      setFocusBand(false);
+    }
+  }, [focusBand, travel.status]);
+
   const onFind = async () => {
     setBusy(true);
+    setOpen(false);
     const address = form.venueAddress.trim() || form.venueName.trim();
     const next = await resolveDistance(address);
     setTravel(next);
@@ -83,9 +113,13 @@ export function VenueField({
 
   const pickSuggestion = async (s: VenueSuggestion) => {
     setField("venueName", s.label);
+    setSuggestions([]);
+    setStatus("idle");
     setOpen(false);
     setBusy(true);
-    const next = await resolveDistance(s.label);
+    // The suggestion already carries coordinates — resolve travel straight from
+    // them rather than re-geocoding the label.
+    const next = await travelToCoords(s.lat, s.lng);
     setTravel(next);
     setBusy(false);
   };
@@ -95,10 +129,19 @@ export function VenueField({
     setTravel(travelFromBand(band === "" ? null : band));
   };
 
+  const chooseBandInstead = () => {
+    setOpen(false);
+    if (travel.status !== "unknown") setTravel(unknownTravel());
+    setFocusBand(true);
+  };
+
   const indicative =
     travel.status === "destination" && travel.oneWayKm != null
       ? destinationIndicative(travel.oneWayKm, heads)
       : null;
+
+  const statusId = status === "empty" || status === "searching" ? "venueStatus" : undefined;
+  const usesOpenStreetMap = suggestions.some((s) => s.source === "nominatim");
 
   return (
     <div ref={boxRef} className="venue-field">
@@ -118,8 +161,12 @@ export function VenueField({
             aria-invalid={!!errors.venue}
             aria-expanded={open}
             aria-controls="venueSuggestions"
+            aria-describedby={statusId}
             onChange={(e) => setField("venueName", e.target.value)}
             onFocus={() => setOpen(suggestions.length > 0)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setOpen(false);
+            }}
           />
         </Field>
         {open ? (
@@ -127,16 +174,40 @@ export function VenueField({
             {suggestions.map((s) => (
               <li key={`${s.label}-${s.lat}-${s.lng}`}>
                 <button type="button" role="option" aria-selected="false" onClick={() => pickSuggestion(s)}>
-                  <span>{s.label}</span>
+                  <span className="venue-suggestions__label">{s.label}</span>
                   <span className="venue-suggestions__tag">
-                    {s.verified ? "Verified" : "Suggested"}
+                    {s.verified ? "Verified" : s.source === "directory" ? "Directory" : "Suggested"}
                   </span>
                 </button>
               </li>
             ))}
+            {usesOpenStreetMap ? (
+              <li className="venue-suggestions__attribution" aria-hidden="true">
+                {NOMINATIM_ATTRIBUTION}
+              </li>
+            ) : null}
           </ul>
         ) : null}
       </div>
+
+      {status === "searching" ? (
+        <p id="venueStatus" className="venue-status venue-status--searching" role="status" aria-live="polite">
+          Searching venues…
+        </p>
+      ) : null}
+      {status === "empty" ? (
+        <p id="venueStatus" className="venue-status venue-status--empty" role="status" aria-live="polite">
+          <span>No matches yet — add the address and we'll confirm travel.</span>
+          <button type="button" className="venue-status__link" onClick={chooseBandInstead}>
+            Choose a distance band instead
+          </button>
+        </p>
+      ) : null}
+      {status === "results" && !open ? (
+        <p className="venue-status" role="status" aria-live="polite">
+          {suggestions.length} {suggestions.length === 1 ? "match" : "matches"} found.
+        </p>
+      ) : null}
 
       <Field label="Venue address" htmlFor="venueAddress" hint="Street, suburb, city.">
         <input

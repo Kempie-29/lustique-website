@@ -40,9 +40,17 @@ Never letterbox a portrait into a band or vice-versa — recrop, do not squash.
 
 ## Brand mark on photography
 
-- The mark is a white-ground raster today (see `public/assets/`). On dark or
-  burgundy surfaces it sits on an ivory plate (`.logo--on-dark`) — never white
-  on dark. A transparent, high-resolution export remains the ideal.
+- Two assets are installed in `public/assets/`:
+  - `logo.svg` — the crisp vector monogram, used for the small header mark
+    (`Logo variant="emblem"`). It stays sharp at any size/DPI.
+  - `lustique-logo.jpeg` — the photographic emblem + wordmark lockup, used for
+    the larger `variant="full"` placements (footer, dashboard, sign-in). It is a
+    compressed, white-ground, low-resolution raster, so it is never used small.
+- On dark or burgundy surfaces the mark sits on an ivory plate
+  (`.logo--on-dark`) — never white on dark.
+- A transparent, high-resolution lockup export remains the ideal: dropping one
+  in at `public/assets/lustique-logo.jpeg` (same filenames) needs no markup
+  change, and would let the header use the real emblem again.
 
 ## Tone of imagery
 

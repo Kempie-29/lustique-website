@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Brand } from "@/components/shell/Brand";
 import { Button } from "@/components/primitives/Button";
-import { site, whatsappLink } from "@/content/site";
 
 export interface NavItem {
   label: string;
@@ -16,9 +15,9 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Portfolio", to: "/portfolio" },
   { label: "Pricing", to: "/pricing" },
   { label: "Guides", to: "/guides" },
-    { label: "Journal", to: "/journal" },
-    { label: "Your portal", to: "/portal" },
-  ];
+  { label: "Journal", to: "/journal" },
+  { label: "Your portal", to: "/portal" },
+];
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -67,20 +66,10 @@ export function Header() {
         </nav>
 
         <div className="header-actions">
-          <Button to="/quote" variant="primary" size="sm">
-            Get a Quote
-          </Button>
-          <Button
-            href={whatsappLink()}
-            variant="whatsapp"
-            size="sm"
-            target="_blank"
-            rel="noopener"
-            aria-label={`Chat with ${site.name} on WhatsApp`}
-          >
-            WhatsApp
-          </Button>
-        </div>
+                  <Button to="/quote" variant="primary" size="sm">
+                    Get a Quote
+                  </Button>
+                </div>
 
         <button
           className="hamburger"
@@ -106,20 +95,10 @@ export function Header() {
           ))}
         </ul>
         <div className="mobile-nav__actions" style={{ padding: "0 var(--gutter) var(--space-md)" }}>
-          <Button to="/quote" variant="primary" block>
-            Get a Quote
-          </Button>
-          <Button
-            href={whatsappLink()}
-            variant="whatsapp"
-            block
-            target="_blank"
-            rel="noopener"
-            aria-label={`Chat with ${site.name} on WhatsApp`}
-          >
-            WhatsApp
-          </Button>
-        </div>
+                  <Button to="/quote" variant="primary" block>
+                    Get a Quote
+                  </Button>
+                </div>
       </div>
     </header>
   );
